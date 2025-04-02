@@ -1,0 +1,16 @@
+[
+  {
+    "userId": "date.now()",
+    "username": "a",
+    "bookmarks": [
+      {
+        "bId": "date.now()",
+        "url": "www.github.com",
+        "category": "git",
+        "fav": false,
+        "createdAt": "timeStamp"
+      }
+    ],
+    "categories": ["git", "blog", "fav"]
+  }
+]
