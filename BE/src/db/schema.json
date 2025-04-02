@@ -11,6 +11,7 @@
         "createdAt": "timeStamp"
       }
     ],
-    "categories": ["git", "blog", "fav"]
+    "categories": ["git", "blog", "fav"],
+    "refreshToken": "refreshToken"
   }
 ]

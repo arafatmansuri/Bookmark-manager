@@ -1,4 +1,11 @@
 const { readFile, writeFile } = require("../db/fileHandler.js");
+const bcrypt = require("bcrypt");
+async function encryptPassword(password) {
+  return await bcrypt.hash(password, 10);
+}
+async function comparePassword(password, enPassword) {
+  return await bcrypt.compare(password, enPassword);
+}
 async function register(req, res) {
   try {
     const { username, password } = req.body;
@@ -9,9 +16,11 @@ async function register(req, res) {
     if (users.find((user) => user.username === username)) {
       return res.status(303).json({ message: "Username already exists" });
     }
+    const hashedPassword = await encryptPassword(password);
     const newUser = {
       userId: new Date(),
       username: username,
+      password: hashedPassword,
       bookmarks: [],
       categories: ["fav"],
     };

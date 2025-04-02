@@ -1,7 +1,7 @@
 const fs = require("fs");
 function readFile() {
   return new Promise((resolve, reject) => {
-    fs.readFile("./bookmarks.json", "utf-8", (err, data) => {
+    fs.readFile(__dirname + "/bookmarks.json", "utf-8", (err, data) => {
       if (err) {
         reject(err);
       }
@@ -11,7 +11,7 @@ function readFile() {
 }
 function writeFile(data) {
   return new Promise((resolve, reject) => {
-    fs.writeFile("./bookmarks.json", JSON.stringify(data), (err) => {
+    fs.writeFile(__dirname + "/bookmarks.json", JSON.stringify(data), (err) => {
       if (err) {
         reject(err);
       }
