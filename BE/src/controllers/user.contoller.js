@@ -75,5 +75,8 @@ async function login(req, res) {
     .status(200)
     .json({ message: "User logged in successfully" });
 }
-
-module.exports = { register, login };
+async function getUser(req, res) {
+  const user = req.user;
+  res.status(200).json({ message: "User data fetched successfully", user });
+}
+module.exports = { register, login, getUser };
