@@ -9,7 +9,7 @@ function comparePassword(password, enPassword) {
 }
 function generateAccess_RereshToken(username) {
   const accessToken = jwt.sign({ username }, process.env.JWT_SECRET, {
-    expiresIn: "15m",
+    expiresIn: "2m",
   });
   const refreshToken = jwt.sign({ username }, process.env.JWT_REFSECRET, {
     expiresIn: "1d",
@@ -79,4 +79,45 @@ async function getUser(req, res) {
   const user = req.user;
   res.status(200).json({ message: "User data fetched successfully", user });
 }
-module.exports = { register, login, getUser };
+
+async function refreshAccessToken(req, res) {
+  try {
+    const IrefreshToken = req.cookies?.refreshToken;
+    if (!IrefreshToken) {
+      return res.status(401).json({ message: "Refresh token is empty" });
+    }
+    const decodedToken = jwt.verify(IrefreshToken, process.env.JWT_REFSECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const users = await readFile();
+    const user = users.findIndex(
+      (user) => user.username === decodedToken.username
+    );
+    if (user == -1 || users[user].refreshToken !== IrefreshToken) {
+      return res.status(401).json({ message: "Invalid refresh Token" });
+    }
+    const { accessToken, refreshToken } = generateAccess_RereshToken(
+      users[user].username
+    );
+    users[user].refreshToken = refreshToken;
+    await writeFile(users);
+    const options = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    };
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json({ message: "Token refresh success" });
+  } catch (err) {
+    return res
+      .status(401)
+      .json({ message: err.message || "Something went wrong from our side" });
+  }
+}
+module.exports = { register, login, getUser, refreshAccessToken };

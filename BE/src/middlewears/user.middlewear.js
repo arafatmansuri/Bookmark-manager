@@ -17,7 +17,7 @@ async function verifyJWT(req, res, next) {
     next();
   } catch (err) {
     return res
-      .status(500)
+      .status(401)
       .json({ message: err.message || "Something went wrong from our side" });
   }
 }
