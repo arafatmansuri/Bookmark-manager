@@ -79,6 +79,11 @@ async function updateCategory(req, res) {
         .status(303)
         .json({ message: "Category name must not be empty" });
     }
+    if (
+      users[userIndex].categories.find((cat) => cat.category == newCategoryName)
+    ) {
+      return res.status(302).json({ message: "Category already exists" });
+    }
     const categoryIndex = users[userIndex].categories.findIndex(
       (cat) => cat.id == categoryId
     );

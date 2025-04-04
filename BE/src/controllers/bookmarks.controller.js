@@ -79,6 +79,11 @@ async function updateBookmark(req, res) {
     }
     const users = req.users;
     const userIndex = req.userIndex;
+    if (
+      !users[userIndex].categories.find((cat) => cat.category === newCategory)
+    ) {
+      return res.status(404).json({ message: "Category not found" });
+    }
     const bookmarkIndex = users[userIndex].bookmarks.findIndex(
       (bm) => bm.id === bookmarkId
     );
