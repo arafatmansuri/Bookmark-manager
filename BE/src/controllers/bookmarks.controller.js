@@ -168,6 +168,13 @@ async function changeFavourites(req, res) {
     });
   }
 }
+async function displayFavourite(req, res) {
+  const user = req.user;
+  const bookmarks = user.bookmarks.filter((bm) => bm.fav === true);
+  return res
+    .status(200)
+    .json({ message: "Favourites fetched successfully", bookmarks });
+}
 module.exports = {
   addBookmark,
   displayAllBookmarks,
@@ -175,4 +182,5 @@ module.exports = {
   updateBookmark,
   getBookmarksByCategory,
   changeFavourites,
+  displayFavourite,
 };
