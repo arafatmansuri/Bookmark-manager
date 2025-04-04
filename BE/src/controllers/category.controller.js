@@ -68,4 +68,33 @@ async function deleteCategory(req, res) {
   }
 }
 
-module.exports = { addCategory, getAllCategories, deleteCategory };
+async function updateCategory(req, res) {
+  const newCategoryName = req.body.categoryName;
+  const categoryId = req.params.id;
+  const users = req.users;
+  const userIndex = req.userIndex;
+  if (newCategoryName === "") {
+    return res.status(303).json({ message: "Category name must not be empty" });
+  }
+  const categoryIndex = users[userIndex].categories.findIndex(
+    (cat) => cat.id == categoryId
+  );
+  if (categoryIndex == -1) {
+    return res.status(500).json({
+      message:
+        "Something went wrong from our side while deleting category,Id not found",
+    });
+  }
+  users[userIndex].categories[categoryIndex].category = newCategoryName;
+  await writeFile(users);
+  return res.status(200).json({
+    message: "Category updated successfully",
+    category: users[userIndex].categories[categoryIndex],
+  });
+}
+module.exports = {
+  addCategory,
+  getAllCategories,
+  deleteCategory,
+  updateCategory,
+};
