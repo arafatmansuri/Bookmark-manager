@@ -9,6 +9,11 @@ async function addCategory(req, res) {
     }
     const userIndex = req.userIndex;
     const users = req.users;
+    if (
+      users[userIndex].categories.find((cat) => cat.category == categoryName)
+    ) {
+      return res.status(302).json({ message: "Category already exists" });
+    }
     const newCategory = {
       id: new Date(),
       category: categoryName,
