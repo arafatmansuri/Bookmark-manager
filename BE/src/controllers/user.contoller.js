@@ -32,7 +32,7 @@ async function register(req, res) {
       username: username,
       password: hashedPassword,
       bookmarks: [],
-      categories: ["fav"],
+      categories: [{ id: new Date(), category: "fav" }],
     };
     users.push(newUser);
     await writeFile(users);

@@ -9,11 +9,15 @@ async function verifyJWT(req, res, next) {
     }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const users = await readFile();
-    const user = users.find((user) => user.username === decodedToken.username);
-    if (!user) {
+    const userIndex = users.findIndex(
+      (user) => user.username === decodedToken.username
+    );
+    if (userIndex == -1) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    req.user = user;
+    req.users = users;
+    req.user = users[userIndex];
+    req.userIndex = userIndex;
     next();
   } catch (err) {
     return res

@@ -12,7 +12,16 @@
         "createdAt": "timeStamp"
       }
     ],
-    "categories": ["git", "blog", "fav"],
+    "categories": [
+      {
+        "id": "new Date()",
+        "category": "fav"
+      },
+      {
+        "id": "new Date()",
+        "category": "git"
+      }
+    ],
     "refreshToken": "refreshToken"
   }
 ]
