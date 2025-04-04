@@ -106,9 +106,39 @@ async function updateBookmark(req, res) {
     });
   }
 }
+async function getBookmarksByCategory(req, res) {
+  try {
+    const category = req.params.category;
+    if ([category].some((feild) => feild === "")) {
+      return res.status(304).json({ message: "All fields are required" });
+    }
+    const user = req.user;
+    if (
+      !user.categories.find((cat) => cat.category === category) &&
+      !category === "All"
+    ) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    let bookmarks = [];
+    if (category === "All") {
+      bookmarks = user.bookmarks;
+    } else {
+      bookmarks = user.bookmarks.filter((bm) => bm.category === category);
+    }
+    return res.status(200).json({
+      message: `Bookmarks fetched for ${category} category`,
+      bookmarks,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message || "Something went wrong while creating bookmark",
+    });
+  }
+}
 module.exports = {
   addBookmark,
   displayAllBookmarks,
   deleteBookmark,
   updateBookmark,
+  getBookmarksByCategory,
 };
