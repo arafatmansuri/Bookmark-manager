@@ -70,4 +70,40 @@ async function deleteBookmark(req, res) {
     });
   }
 }
-module.exports = { addBookmark, displayAllBookmarks, deleteBookmark };
+async function updateBookmark(req, res) {
+  try {
+    const bookmarkId = Number(req.params.id);
+    const { newUrl, newCategory } = req.body;
+    if ([bookmarkId, newUrl, newCategory].some((feild) => feild === "")) {
+      return res.status(304).json({ message: "All fields are required" });
+    }
+    const users = req.users;
+    const userIndex = req.userIndex;
+    const bookmarkIndex = users[userIndex].bookmarks.findIndex(
+      (bm) => bm.id === bookmarkId
+    );
+    if (bookmarkIndex == -1) {
+      return res.status(500).json({
+        message:
+          "Something went wrong from our side while updating category,Id not found",
+      });
+    }
+    users[userIndex].bookmarks[bookmarkIndex].url = newUrl;
+    users[userIndex].bookmarks[bookmarkIndex].category = newCategory;
+    await writeFile(users);
+    return res.status(200).json({
+      message: "Bookmark updated successfully",
+      updatedBookmark: users[userIndex].bookmarks[bookmarkIndex],
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message || "Something went wrong while creating bookmark",
+    });
+  }
+}
+module.exports = {
+  addBookmark,
+  displayAllBookmarks,
+  deleteBookmark,
+  updateBookmark,
+};
