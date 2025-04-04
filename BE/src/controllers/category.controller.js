@@ -30,4 +30,15 @@ async function addCategory(req, res) {
       .json({ message: err.message || "Something went wrong from our side" });
   }
 }
-module.exports = { addCategory };
+
+async function getAllCategories(req, res) {
+  const user = req.user;
+  const categories = user.categories;
+  return res.status(200).json({
+    message: "Categories fetched successfully",
+    username: user.username,
+    categories,
+  });
+}
+
+module.exports = { addCategory, getAllCategories };
