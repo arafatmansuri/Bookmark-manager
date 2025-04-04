@@ -135,10 +135,44 @@ async function getBookmarksByCategory(req, res) {
     });
   }
 }
+async function changeFavourites(req, res) {
+  try {
+    const bookmarkId = Number(req.params.id);
+    if ([bookmarkId].some((feild) => feild === "")) {
+      return res.status(304).json({ message: "All fields are required" });
+    }
+    const users = req.users;
+    const userIndex = req.userIndex;
+    const bookmarkIndex = users[userIndex].bookmarks.findIndex(
+      (bm) => bm.id === bookmarkId
+    );
+    if (bookmarkIndex == -1) {
+      return res.status(500).json({
+        message:
+          "Something went wrong from our side while updating category,Id not found",
+      });
+    }
+    if (users[userIndex].bookmarks[bookmarkIndex].fav) {
+      users[userIndex].bookmarks[bookmarkIndex].fav = false;
+    } else {
+      users[userIndex].bookmarks[bookmarkIndex].fav = true;
+    }
+    await writeFile(users);
+    return res.status(200).json({
+      message: `Favourite status changed to ${users[userIndex].bookmarks[bookmarkIndex].fav}`,
+      bookmark: users[userIndex].bookmarks[bookmarkIndex],
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message || "Something went wrong while creating bookmark",
+    });
+  }
+}
 module.exports = {
   addBookmark,
   displayAllBookmarks,
   deleteBookmark,
   updateBookmark,
   getBookmarksByCategory,
+  changeFavourites,
 };
