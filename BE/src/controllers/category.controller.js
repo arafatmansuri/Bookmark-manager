@@ -15,7 +15,7 @@ async function addCategory(req, res) {
       return res.status(302).json({ message: "Category already exists" });
     }
     const newCategory = {
-      id: new Date(),
+      id: Date.now(),
       category: categoryName,
     };
     users[userIndex].categories.push(newCategory);
@@ -41,4 +41,31 @@ async function getAllCategories(req, res) {
   });
 }
 
-module.exports = { addCategory, getAllCategories };
+async function deleteCategory(req, res) {
+  try {
+    const categoryId = parseInt(req.params.id);
+    const users = req.users;
+    const userIndex = req.userIndex;
+    const categoryIndex = users[userIndex].categories.findIndex(
+      (cat) => cat.id == categoryId
+    );
+    if (categoryIndex == -1) {
+      return res.status(500).json({
+        message:
+          "Something went wrong from our side while deleting category,Id not found",
+      });
+    }
+    const deletedCategory = users[userIndex].categories[categoryIndex];
+    users[userIndex].categories.splice(categoryIndex, 1);
+    await writeFile(users);
+    return res
+      .status(200)
+      .json({ message: "Category Deleted successfully", deletedCategory });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Something went wrong from our side while deleting category",
+    });
+  }
+}
+
+module.exports = { addCategory, getAllCategories, deleteCategory };
