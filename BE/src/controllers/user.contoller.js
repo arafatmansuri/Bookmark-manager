@@ -124,4 +124,10 @@ async function refreshAccessToken(req, res) {
       .json({ message: err.message || "Something went wrong from our side" });
   }
 }
-module.exports = { register, login, getUser, refreshAccessToken };
+async function logout(req, res) {
+  return res
+    .clearCookie("accessToken", { path: "/" })
+    .clearCookie("refreshToken", { path: "/" })
+    .end();
+}
+module.exports = { register, login, getUser, refreshAccessToken, logout };

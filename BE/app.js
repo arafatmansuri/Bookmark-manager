@@ -16,6 +16,7 @@ app.use("/api/v1/category", verifyJWT, categoryRouter);
 app.use("/api/v1/bookmark", verifyJWT, bookmarkRouter);
 app.get("/", (req, res) => {
   return res.send("Server running fine");
+  res.clearCookie()
 });
 
 module.exports = app;
