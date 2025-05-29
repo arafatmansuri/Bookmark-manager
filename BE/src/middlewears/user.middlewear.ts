@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const { readFile } = require("../db/fileHandler.js");
+import jwt from "jsonwebtoken";
+import { readFile } from "../db/fileHandler";
 
 async function verifyJWT(req, res, next) {
   try {
@@ -25,4 +25,4 @@ async function verifyJWT(req, res, next) {
       .json({ message: err.message || "Something went wrong from our side" });
   }
 }
-module.exports = { verifyJWT };
+export { verifyJWT };

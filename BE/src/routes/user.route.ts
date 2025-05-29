@@ -1,12 +1,12 @@
-const { Router } = require("express");
-const {
-  register,
-  login,
+import { Router } from "express";
+import {
   getUser,
-  refreshAccessToken,
+  login,
   logout,
-} = require("../controllers/user.contoller.js");
-const { verifyJWT } = require("../middlewears/user.middlewear.js");
+  refreshAccessToken,
+  register,
+} from "../controllers/user.contoller";
+import { verifyJWT } from "../middlewears/user.middlewear";
 
 const userRouter = Router();
 
@@ -16,4 +16,4 @@ userRouter.route("/getuser").get(verifyJWT, getUser);
 userRouter.route("/refreshtoken").post(refreshAccessToken);
 userRouter.route("/logout").get(logout);
 
-module.exports = userRouter;
+export default userRouter;

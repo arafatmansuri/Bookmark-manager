@@ -1,6 +1,6 @@
-const { readFile, writeFile } = require("../db/fileHandler.js");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { readFile, writeFile } from "../db/fileHandler";
 async function encryptPassword(password) {
   return await bcrypt.hash(password, 10);
 }
@@ -130,4 +130,4 @@ async function logout(req, res) {
     .clearCookie("refreshToken", { path: "/" })
     .end();
 }
-module.exports = { register, login, getUser, refreshAccessToken, logout };
+export { getUser, login, logout, refreshAccessToken, register };

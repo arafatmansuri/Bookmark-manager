@@ -1,15 +1,15 @@
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   addBookmark,
-  displayAllBookmarks,
-  deleteBookmark,
-  updateBookmark,
-  getBookmarksByCategory,
   changeFavourites,
+  deleteBookmark,
+  displayAllBookmarks,
   displayFavourite,
-} = require("../controllers/bookmarks.controller.js");
+  getBookmarksByCategory,
+  updateBookmark,
+} from "../controllers/bookmarks.controller";
 
-bookmarkRouter = Router();
+const bookmarkRouter = Router();
 
 bookmarkRouter.route("/add").post(addBookmark);
 bookmarkRouter.route("/display").get(displayAllBookmarks);
@@ -19,4 +19,4 @@ bookmarkRouter.route("/display/:category").get(getBookmarksByCategory);
 bookmarkRouter.route("/changefav/:id").put(changeFavourites);
 bookmarkRouter.route("/displayfav").get(displayFavourite);
 
-module.exports = bookmarkRouter;
+export default bookmarkRouter;

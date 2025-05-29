@@ -1,4 +1,4 @@
-const { writeFile } = require("../db/fileHandler.js");
+import { writeFile } from "../db/fileHandler";
 async function addCategory(req, res) {
   try {
     const { categoryName } = req.body;
@@ -105,9 +105,4 @@ async function updateCategory(req, res) {
     });
   }
 }
-module.exports = {
-  addCategory,
-  getAllCategories,
-  deleteCategory,
-  updateCategory,
-};
+export { addCategory, deleteCategory, getAllCategories, updateCategory };

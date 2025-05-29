@@ -1,4 +1,4 @@
-const { writeFile } = require("../db/fileHandler.js");
+import { writeFile } from "../db/fileHandler";
 async function addBookmark(req, res) {
   try {
     const { bookmarkUrl, category } = req.body;
@@ -175,7 +175,7 @@ async function displayFavourite(req, res) {
     .status(200)
     .json({ message: "Favourites fetched successfully", bookmarks });
 }
-module.exports = {
+export{
   addBookmark,
   displayAllBookmarks,
   deleteBookmark,

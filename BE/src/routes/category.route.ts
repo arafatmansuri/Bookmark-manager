@@ -1,10 +1,10 @@
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   addCategory,
-  getAllCategories,
   deleteCategory,
+  getAllCategories,
   updateCategory,
-} = require("../controllers/category.controller.js");
+} from "../controllers/category.controller";
 
 const categoryRouter = Router();
 
@@ -13,4 +13,4 @@ categoryRouter.route("/display").get(getAllCategories);
 categoryRouter.route("/delete/:id").delete(deleteCategory);
 categoryRouter.route("/update/:id").put(updateCategory);
 
-module.exports = categoryRouter;
+export default categoryRouter;
