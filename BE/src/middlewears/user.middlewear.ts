@@ -14,7 +14,7 @@ async function verifyJWT(
       res.status(401).json({ message: "Token not found" });
       return;
     }
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = jwt.verify(token, <string>process.env.JWT_SECRET);
     const users: Schema[] = await readFile();
     const userIndex: number = users.findIndex(
       (user) => user.username === (decodedToken as TokenType).username
@@ -28,7 +28,7 @@ async function verifyJWT(
     req.userIndex = userIndex;
     next();
     return;
-  } catch (err) {
+  } catch (err: any) {
     res
       .status(401)
       .json({ message: err.message || "Something went wrong from our side" });

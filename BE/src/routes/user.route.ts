@@ -7,7 +7,7 @@ import {
   register,
 } from "../controllers/user.contoller";
 import { verifyJWT } from "../middlewears/user.middlewear";
-const userRouter = Router();
+const userRouter: Router = Router();
 
 userRouter.route("/register").post(register);
 userRouter.route("/login").post(login);

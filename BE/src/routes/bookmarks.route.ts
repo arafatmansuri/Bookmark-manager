@@ -9,7 +9,7 @@ import {
   updateBookmark,
 } from "../controllers/bookmarks.controller";
 
-const bookmarkRouter = Router();
+const bookmarkRouter:Router = Router();
 
 bookmarkRouter.route("/add").post(addBookmark);
 bookmarkRouter.route("/display").get(displayAllBookmarks);

@@ -6,7 +6,7 @@ import {
   updateCategory,
 } from "../controllers/category.controller";
 
-const categoryRouter = Router();
+const categoryRouter: Router = Router();
 
 categoryRouter.route("/add").post(addCategory);
 categoryRouter.route("/display").get(getAllCategories);

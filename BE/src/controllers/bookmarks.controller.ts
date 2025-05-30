@@ -31,7 +31,7 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
       .status(200)
       .json({ message: "Bookmark created successfully", newBookmark });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });
@@ -75,7 +75,7 @@ const deleteBookmark: Handler = async (req, res): Promise<void> => {
       .status(200)
       .json({ message: "Bookmark deleted successfully", deletedBookmark });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });
@@ -119,7 +119,7 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
       updatedBookmark: users[userIndex].bookmarks[bookmarkIndex],
     });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });
@@ -154,7 +154,7 @@ const getBookmarksByCategory: Handler = async (req, res): Promise<void> => {
       bookmarks,
     });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });
@@ -188,7 +188,7 @@ const changeFavourites: Handler = async (req, res): Promise<void> => {
       bookmark: users[userIndex].bookmarks[bookmarkIndex],
     });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });

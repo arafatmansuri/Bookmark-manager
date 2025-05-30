@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { readFile, writeFile } from "../db/fileHandler";
 import { Handler, Schema } from "../types";
-async function encryptPassword(password) {
+async function encryptPassword(password:string) {
   return await bcrypt.hash(password, 10);
 }
 function comparePassword(password: string, enPassword: string): boolean {
@@ -13,12 +13,12 @@ function generateAccess_RereshToken(username: string): {
   accessToken: string;
   refreshToken: string;
 } {
-  const accessToken: string = jwt.sign({ username }, process.env.JWT_SECRET, {
+  const accessToken: string = jwt.sign({ username }, <string>process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
   const refreshToken: string = jwt.sign(
     { username },
-    process.env.JWT_REFSECRET,
+    <string>process.env.JWT_REFSECRET,
     {
       expiresIn: "1d",
     }
@@ -107,7 +107,7 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Refresh token is empty" });
       return;
     }
-    const decodedToken = jwt.verify(IrefreshToken, process.env.JWT_REFSECRET);
+    const decodedToken = jwt.verify(IrefreshToken, <string>process.env.JWT_REFSECRET);
     if (!decodedToken) {
       res.status(401).json({ message: "Unauthorized" });
       return;
@@ -138,7 +138,7 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       .cookie("refreshToken", refreshToken, options)
       .json({ message: "Token refresh success" });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res
       .status(401)
       .json({ message: err.message || "Something went wrong from our side" });

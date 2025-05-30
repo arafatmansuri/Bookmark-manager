@@ -27,7 +27,7 @@ const addCategory: Handler = async (req, res): Promise<void> => {
       message: "New category added sucessfully",
       category: newCategory,
     });
-  } catch (err) {
+  } catch (err: any) {
     res
       .status(500)
       .json({ message: err.message || "Something went wrong from our side" });
@@ -111,7 +111,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       category: users[userIndex].categories[categoryIndex],
     });
     return;
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });

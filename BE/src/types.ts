@@ -3,7 +3,7 @@ export interface Schema {
   userId: Date;
   username: string;
   password: string;
-  bookmarks?: [
+  bookmarks: [
     {
       id?: number;
       url?: string;
@@ -12,7 +12,7 @@ export interface Schema {
       createdAt?: Date;
     }
   ];
-  categories?: [
+  categories: [
     {
       id: number;
       category: string;
