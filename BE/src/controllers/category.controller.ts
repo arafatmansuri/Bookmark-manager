@@ -1,17 +1,19 @@
+import { z } from "zod";
 import { writeFile } from "../db/fileHandler";
 import { CategoryType, Handler, Schema } from "../types";
+const str = z.string().min(3,{"message":"Cateory name must contain atleast 3 char"});
 const addCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const { categoryName } = req.body;
-    if (categoryName === "") {
-      res.status(303).json({ message: "Category name must not be empty" });
+    const parsedData = str.safeParse(req.body.categoryName);
+    if (parsedData.error) {
+      res.status(303).json({ message: parsedData.error.message || "Category name must not be empty" });
       return;
     }
-    const userIndex: number = req.userIndex;
     const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
     if (
       users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category == categoryName
+        (cat: CategoryType) => cat.category == parsedData.data
       )
     ) {
       res.status(302).json({ message: "Category already exists" });
@@ -19,7 +21,7 @@ const addCategory: Handler = async (req, res): Promise<void> => {
     }
     const newCategory: CategoryType = {
       id: Number(new Date()),
-      category: categoryName,
+      category: parsedData.data,
     };
     users[userIndex].categories.push(newCategory);
     await writeFile(users);
@@ -78,17 +80,22 @@ const deleteCategory: Handler = async (req, res): Promise<void> => {
 
 const updateCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const newCategoryName: string = req.body.categoryName;
     const categoryId: number = Number(req.params.id);
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    if (newCategoryName === "") {
-      res.status(303).json({ message: "Category name must not be empty" });
+    const parsedData = str.safeParse(req.body.newCategoryName);
+    if (parsedData.error) {
+      res
+        .status(303)
+        .json({
+          message:
+            parsedData.error.message || "Category name must not be empty",
+        });
       return;
     }
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
     if (
       users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category == newCategoryName
+        (cat: CategoryType) => cat.category == parsedData.data
       )
     ) {
       res.status(302).json({ message: "Category already exists" });
@@ -104,7 +111,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    users[userIndex].categories[categoryIndex].category = newCategoryName;
+    users[userIndex].categories[categoryIndex].category = parsedData.data;
     await writeFile(users);
     res.status(200).json({
       message: "Category updated successfully",

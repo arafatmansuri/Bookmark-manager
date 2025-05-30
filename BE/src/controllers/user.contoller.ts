@@ -1,9 +1,21 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { z } from "zod";
 import { readFile, writeFile } from "../db/fileHandler";
 import { Handler, Schema } from "../types";
-async function encryptPassword(password:string) {
+
+const userInputSchema = z.object({
+  username: z
+    .string()
+    .min(3, { message: "Username must be atleast 3 charachter" })
+    .trim(),
+  password: z
+    .string()
+    .min(4, { message: "Password must be atleast 4 charachter" }),
+});
+type UserInputType = z.infer<typeof userInputSchema>;
+async function encryptPassword(password: string) {
   return await bcrypt.hash(password, 10);
 }
 function comparePassword(password: string, enPassword: string): boolean {
@@ -13,9 +25,13 @@ function generateAccess_RereshToken(username: string): {
   accessToken: string;
   refreshToken: string;
 } {
-  const accessToken: string = jwt.sign({ username }, <string>process.env.JWT_SECRET, {
-    expiresIn: "15m",
-  });
+  const accessToken: string = jwt.sign(
+    { username },
+    <string>process.env.JWT_SECRET,
+    {
+      expiresIn: "15m",
+    }
+  );
   const refreshToken: string = jwt.sign(
     { username },
     <string>process.env.JWT_REFSECRET,
@@ -27,20 +43,22 @@ function generateAccess_RereshToken(username: string): {
 }
 const register: Handler = async (req, res): Promise<void> => {
   try {
-    const { username, password } = req.body;
-    if ([username, password].some((field) => field === "")) {
-      res.status(301).json({ message: "Username/password compulsory" });
+    const parsedBody = userInputSchema.safeParse(req.body);
+    if (parsedBody.error) {
+      res.status(301).json({
+        message: parsedBody.error.message || "Username/password compulsory",
+      });
       return;
     }
     const users: Schema[] = await readFile();
-    if (users.find((user) => user.username === username)) {
+    if (users.find((user) => user.username === parsedBody.data.username)) {
       res.status(303).json({ message: "Username already exists" });
       return;
     }
-    const hashedPassword = await encryptPassword(password);
+    const hashedPassword = await encryptPassword(parsedBody.data.password);
     const newUser: Schema = {
       userId: new Date(),
-      username: username,
+      username: parsedBody.data.username,
       password: hashedPassword,
       bookmarks: [{}],
       categories: [{ id: Number(new Date()), category: "fav" }],
@@ -56,22 +74,28 @@ const register: Handler = async (req, res): Promise<void> => {
 };
 async function login(req: Request, res: Response): Promise<void> {
   try {
-    const { username, password } = req.body;
-    if ([username, password].some((field) => field === "")) {
-      res.status(301).json({ message: "Username/password compulsory" });
+    const parsedBody = userInputSchema.safeParse(req.body);
+    if (parsedBody.error) {
+      res.status(301).json({
+        message: parsedBody.error.message || "Username/password compulsory",
+      });
       return;
     }
     const users: Schema[] = await readFile();
-    if (!users.find((user) => user.username === username)) {
+    if (!users.find((user) => user.username === parsedBody.data.username)) {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const userIndex = users.findIndex((user) => user.username === username);
-    if (!comparePassword(password, users[userIndex].password)) {
+    const userIndex = users.findIndex(
+      (user) => user.username === parsedBody.data.username
+    );
+    if (!comparePassword(parsedBody.data.password, users[userIndex].password)) {
       res.status(404).json({ message: "Invalid password" });
       return;
     }
-    const { accessToken, refreshToken } = generateAccess_RereshToken(username);
+    const { accessToken, refreshToken } = generateAccess_RereshToken(
+      parsedBody.data.username
+    );
     users[userIndex].refreshToken = refreshToken;
     await writeFile(users);
     const options = {
@@ -107,7 +131,10 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Refresh token is empty" });
       return;
     }
-    const decodedToken = jwt.verify(IrefreshToken, <string>process.env.JWT_REFSECRET);
+    const decodedToken = jwt.verify(
+      IrefreshToken,
+      <string>process.env.JWT_REFSECRET
+    );
     if (!decodedToken) {
       res.status(401).json({ message: "Unauthorized" });
       return;

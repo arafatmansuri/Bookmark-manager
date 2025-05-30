@@ -1,18 +1,26 @@
+import { z } from "zod";
 import { writeFile } from "../db/fileHandler";
 import { BookmarkType, CategoryType, Handler, Schema } from "../types";
+const bookmarkSchema = z.object({
+  bookmarkUrl: z.string().min(8, { message: "url must be of atleast 8 chars" }),
+  category: z.string(),
+});
+type BookmarkInput = z.infer<typeof bookmarkSchema>;
 const addBookmark: Handler = async (req, res): Promise<void> => {
   try {
-    const { bookmarkUrl, category }: { bookmarkUrl: string; category: string } =
-      req.body;
-    if ([bookmarkUrl, category].some((feild) => feild === "")) {
-      res.status(304).json({ message: "Bookmark url must not be empty" });
+    const bookmarkInput = bookmarkSchema.safeParse(req.body);
+    if (bookmarkInput.error) {
+      res.status(304).json({
+        message:
+          bookmarkInput.error.message || "Bookmark url must not be empty",
+      });
       return;
     }
     const users: Schema[] = req.users;
     const userIndex: number = req.userIndex;
     if (
       !users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category === category
+        (cat: CategoryType) => cat.category === bookmarkInput.data.category
       )
     ) {
       res.status(404).json({ message: "Category not found" });
@@ -20,8 +28,8 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
     }
     const newBookmark: BookmarkType = {
       id: Date.now(),
-      url: bookmarkUrl,
-      category: category,
+      url: bookmarkInput.data.bookmarkUrl,
+      category: bookmarkInput.data.category,
       fav: false,
       createdAt: new Date(),
     };
@@ -85,17 +93,19 @@ const deleteBookmark: Handler = async (req, res): Promise<void> => {
 const updateBookmark: Handler = async (req, res): Promise<void> => {
   try {
     const bookmarkId: number = Number(req.params.id);
-    const { newUrl, newCategory }: { newUrl: string; newCategory: string } =
-      req.body;
-    if ([bookmarkId, newUrl, newCategory].some((feild) => feild === "")) {
-      res.status(304).json({ message: "All fields are required" });
+    const bookmarkInput = bookmarkSchema.safeParse(req.body);
+    if (bookmarkInput.error) {
+      res.status(304).json({
+        message:
+          bookmarkInput.error.message || "Bookmark url must not be empty",
+      });
       return;
     }
     const users: Schema[] = req.users;
     const userIndex: number = req.userIndex;
     if (
       !users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category === newCategory
+        (cat: CategoryType) => cat.category === bookmarkInput.data.category
       )
     ) {
       res.status(404).json({ message: "Category not found" });
@@ -111,8 +121,10 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    users[userIndex].bookmarks[bookmarkIndex].url = newUrl;
-    users[userIndex].bookmarks[bookmarkIndex].category = newCategory;
+    users[userIndex].bookmarks[bookmarkIndex].url =
+      bookmarkInput.data.bookmarkUrl;
+    users[userIndex].bookmarks[bookmarkIndex].category =
+      bookmarkInput.data.category;
     await writeFile(users);
     res.status(200).json({
       message: "Bookmark updated successfully",
