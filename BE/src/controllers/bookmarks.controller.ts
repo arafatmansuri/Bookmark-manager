@@ -2,14 +2,15 @@ import { writeFile } from "../db/fileHandler";
 import { BookmarkType, CategoryType, Handler, Schema } from "../types";
 const addBookmark: Handler = async (req, res) => {
   try {
-    const { bookmarkUrl, category } = req.body;
+    const { bookmarkUrl, category }: { bookmarkUrl: string; category: string } =
+      req.body;
     if ([bookmarkUrl, category].some((feild) => feild === "")) {
       return res
         .status(304)
         .json({ message: "Bookmark url must not be empty" });
     }
-    const users:Schema[] = req.users;
-    const userIndex:number = req.userIndex;
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
     if (
       !users[userIndex].categories.find(
         (cat: CategoryType) => cat.category === category
@@ -17,7 +18,7 @@ const addBookmark: Handler = async (req, res) => {
     ) {
       return res.status(404).json({ message: "Category not found" });
     }
-    const newBookmark:BookmarkType = {
+    const newBookmark: BookmarkType = {
       id: Date.now(),
       url: bookmarkUrl,
       category: category,
