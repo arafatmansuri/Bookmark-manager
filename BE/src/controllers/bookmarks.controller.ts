@@ -1,5 +1,6 @@
 import { writeFile } from "../db/fileHandler";
-async function addBookmark(req, res) {
+import { BookmarkType, CategoryType, Handler, Schema } from "../types";
+const addBookmark: Handler = async (req, res) => {
   try {
     const { bookmarkUrl, category } = req.body;
     if ([bookmarkUrl, category].some((feild) => feild === "")) {
@@ -7,12 +8,16 @@ async function addBookmark(req, res) {
         .status(304)
         .json({ message: "Bookmark url must not be empty" });
     }
-    const users = req.users;
-    const userIndex = req.userIndex;
-    if (!users[userIndex].categories.find((cat) => cat.category === category)) {
+    const users:Schema[] = req.users;
+    const userIndex:number = req.userIndex;
+    if (
+      !users[userIndex].categories.find(
+        (cat: CategoryType) => cat.category === category
+      )
+    ) {
       return res.status(404).json({ message: "Category not found" });
     }
-    const newBookmark = {
+    const newBookmark:BookmarkType = {
       id: Date.now(),
       url: bookmarkUrl,
       category: category,
@@ -29,28 +34,28 @@ async function addBookmark(req, res) {
       message: err.message || "Something went wrong while creating bookmark",
     });
   }
-}
-async function displayAllBookmarks(req, res) {
-  const user = req.user;
-  const bookmarks = user.bookmarks;
+};
+const displayAllBookmarks: Handler = (req, res) => {
+  const user: Schema = req.user;
+  const bookmarks: BookmarkType[] = user.bookmarks;
   return res.status(200).json({
     message: "Bookmarks fetched successfully",
     user: user.username,
     bookmarks,
   });
-}
-async function deleteBookmark(req, res) {
+};
+const deleteBookmark: Handler = async (req, res) => {
   try {
-    const bookmarkId = Number(req.params.id);
+    const bookmarkId: number = Number(req.params.id);
     if ([bookmarkId].some((feild) => feild === null)) {
       return res
         .status(304)
         .json({ message: "Bookmark url must not be empty" });
     }
-    const users = req.users;
-    const userIndex = req.userIndex;
-    const bookmarkIndex = users[userIndex].bookmarks.findIndex(
-      (bm) => bm.id === bookmarkId
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
+    const bookmarkIndex: number = users[userIndex].bookmarks.findIndex(
+      (bm: BookmarkType) => bm.id === bookmarkId
     );
     if (bookmarkIndex == -1) {
       return res.status(500).json({
@@ -58,7 +63,8 @@ async function deleteBookmark(req, res) {
           "Something went wrong from our side while deleting category,Id not found",
       });
     }
-    const deletedBookmark = users[userIndex].bookmarks[bookmarkIndex];
+    const deletedBookmark: BookmarkType =
+      users[userIndex].bookmarks[bookmarkIndex];
     users[userIndex].bookmarks.splice(bookmarkIndex, 1);
     await writeFile(users);
     return res
@@ -69,23 +75,26 @@ async function deleteBookmark(req, res) {
       message: err.message || "Something went wrong while creating bookmark",
     });
   }
-}
-async function updateBookmark(req, res) {
+};
+const updateBookmark: Handler = async (req, res) => {
   try {
-    const bookmarkId = Number(req.params.id);
-    const { newUrl, newCategory } = req.body;
+    const bookmarkId: number = Number(req.params.id);
+    const { newUrl, newCategory }: { newUrl: string; newCategory: string } =
+      req.body;
     if ([bookmarkId, newUrl, newCategory].some((feild) => feild === "")) {
       return res.status(304).json({ message: "All fields are required" });
     }
-    const users = req.users;
-    const userIndex = req.userIndex;
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
     if (
-      !users[userIndex].categories.find((cat) => cat.category === newCategory)
+      !users[userIndex].categories.find(
+        (cat: CategoryType) => cat.category === newCategory
+      )
     ) {
       return res.status(404).json({ message: "Category not found" });
     }
-    const bookmarkIndex = users[userIndex].bookmarks.findIndex(
-      (bm) => bm.id === bookmarkId
+    const bookmarkIndex: number = users[userIndex].bookmarks.findIndex(
+      (bm: BookmarkType) => bm.id === bookmarkId
     );
     if (bookmarkIndex == -1) {
       return res.status(500).json({
@@ -105,25 +114,27 @@ async function updateBookmark(req, res) {
       message: err.message || "Something went wrong while creating bookmark",
     });
   }
-}
-async function getBookmarksByCategory(req, res) {
+};
+const getBookmarksByCategory: Handler = async (req, res) => {
   try {
-    const category = req.params.category;
+    const category: string = req.params.category;
     if ([category].some((feild) => feild === "")) {
       return res.status(304).json({ message: "All fields are required" });
     }
-    const user = req.user;
+    const user: Schema = req.user;
     if (
-      !user.categories.find((cat) => cat.category === category) &&
+      !user.categories.find((cat: CategoryType) => cat.category === category) &&
       category !== "All"
     ) {
       return res.status(404).json({ message: "Category not found" });
     }
-    let bookmarks = [];
+    let bookmarks: BookmarkType[] = [];
     if (category === "All") {
       bookmarks = user.bookmarks;
     } else {
-      bookmarks = user.bookmarks.filter((bm) => bm.category === category);
+      bookmarks = user.bookmarks.filter(
+        (bm: BookmarkType) => bm.category === category
+      );
     }
     return res.status(200).json({
       message: `Bookmarks fetched for ${category} category`,
@@ -134,17 +145,17 @@ async function getBookmarksByCategory(req, res) {
       message: err.message || "Something went wrong while creating bookmark",
     });
   }
-}
-async function changeFavourites(req, res) {
+};
+const changeFavourites: Handler = async (req, res) => {
   try {
-    const bookmarkId = Number(req.params.id);
+    const bookmarkId: number = Number(req.params.id);
     if ([bookmarkId].some((feild) => feild === null || undefined)) {
       return res.status(304).json({ message: "All fields are required" });
     }
-    const users = req.users;
-    const userIndex = req.userIndex;
-    const bookmarkIndex = users[userIndex].bookmarks.findIndex(
-      (bm) => bm.id === bookmarkId
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
+    const bookmarkIndex: number = users[userIndex].bookmarks.findIndex(
+      (bm: BookmarkType) => bm.id === bookmarkId
     );
     if (bookmarkIndex == -1) {
       return res.status(500).json({
@@ -152,11 +163,8 @@ async function changeFavourites(req, res) {
           "Something went wrong from our side while updating category,Id not found",
       });
     }
-    if (users[userIndex].bookmarks[bookmarkIndex].fav) {
-      users[userIndex].bookmarks[bookmarkIndex].fav = false;
-    } else {
-      users[userIndex].bookmarks[bookmarkIndex].fav = true;
-    }
+    users[userIndex].bookmarks[bookmarkIndex].fav =
+      !users[userIndex].bookmarks[bookmarkIndex].fav;
     await writeFile(users);
     return res.status(200).json({
       message: `Favourite status changed to ${users[userIndex].bookmarks[bookmarkIndex].fav}`,
@@ -167,14 +175,16 @@ async function changeFavourites(req, res) {
       message: err.message || "Something went wrong while creating bookmark",
     });
   }
-}
-async function displayFavourite(req, res) {
-  const user = req.user;
-  const bookmarks = user.bookmarks.filter((bm) => bm.fav === true);
+};
+const displayFavourite: Handler = async (req, res) => {
+  const user: Schema = req.user;
+  const bookmarks = user.bookmarks.filter(
+    (bm: BookmarkType) => bm.fav === true
+  );
   return res
     .status(200)
     .json({ message: "Favourites fetched successfully", bookmarks });
-}
+};
 export {
   addBookmark,
   changeFavourites,

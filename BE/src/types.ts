@@ -5,7 +5,7 @@ export interface Schema {
   password: string;
   bookmarks?: [
     {
-      bId?: Date;
+      id?: number;
       url?: string;
       category?: string;
       fav?: boolean;
@@ -20,6 +20,8 @@ export interface Schema {
   ];
   refreshToken?: string;
 }
+export type CategoryType = Pick<Schema, "categories">["categories"][0];
+export type BookmarkType = Pick<Schema, "bookmarks">["bookmarks"][0];
 type Method =
   | "get"
   | "head"
