@@ -1,108 +1,121 @@
 import { writeFile } from "../db/fileHandler";
-async function addCategory(req, res) {
+import { CategoryType, Handler, Schema } from "../types";
+const addCategory: Handler = async (req, res): Promise<void> => {
   try {
     const { categoryName } = req.body;
     if (categoryName === "") {
-      return res
-        .status(303)
-        .json({ message: "Category name must not be empty" });
+      res.status(303).json({ message: "Category name must not be empty" });
+      return;
     }
-    const userIndex = req.userIndex;
-    const users = req.users;
+    const userIndex: number = req.userIndex;
+    const users: Schema[] = req.users;
     if (
-      users[userIndex].categories.find((cat) => cat.category == categoryName)
+      users[userIndex].categories.find(
+        (cat: CategoryType) => cat.category == categoryName
+      )
     ) {
-      return res.status(302).json({ message: "Category already exists" });
+      res.status(302).json({ message: "Category already exists" });
+      return;
     }
-    const newCategory = {
-      id: Date.now(),
+    const newCategory: CategoryType = {
+      id: Number(new Date()),
       category: categoryName,
     };
     users[userIndex].categories.push(newCategory);
     await writeFile(users);
-    return res.status(200).json({
+    res.status(200).json({
       message: "New category added sucessfully",
       category: newCategory,
     });
   } catch (err) {
-    return res
+    res
       .status(500)
       .json({ message: err.message || "Something went wrong from our side" });
+    return;
   }
-}
+};
 
-async function getAllCategories(req, res) {
-  const user = req.user;
-  const categories = user.categories;
-  return res.status(200).json({
+const getAllCategories: Handler = async (req, res): Promise<void> => {
+  const user: Schema = req.user;
+  const categories: CategoryType[] = user.categories;
+  res.status(200).json({
     message: "Categories fetched successfully",
     username: user.username,
     categories,
   });
-}
+};
 
-async function deleteCategory(req, res) {
+const deleteCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const categoryId = parseInt(req.params.id);
-    const users = req.users;
-    const userIndex = req.userIndex;
-    const categoryIndex = users[userIndex].categories.findIndex(
-      (cat) => cat.id == categoryId
+    const categoryId: number = parseInt(req.params.id);
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
+    const categoryIndex: number = users[userIndex].categories.findIndex(
+      (cat: CategoryType) => cat.id == categoryId
     );
     if (categoryIndex == -1) {
-      return res.status(500).json({
+      res.status(500).json({
         message:
           "Something went wrong from our side while deleting category,Id not found",
       });
+      return;
     }
-    const deletedCategory = users[userIndex].categories[categoryIndex];
+    const deletedCategory: CategoryType =
+      users[userIndex].categories[categoryIndex];
     users[userIndex].categories.splice(categoryIndex, 1);
     await writeFile(users);
-    return res
+    res
       .status(200)
       .json({ message: "Category Deleted successfully", deletedCategory });
+    return;
   } catch (err) {
-    return res.status(500).json({
+    res.status(500).json({
       message: "Something went wrong from our side while deleting category",
     });
+    return;
   }
-}
+};
 
-async function updateCategory(req, res) {
+const updateCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const newCategoryName = req.body.categoryName;
-    const categoryId = req.params.id;
-    const users = req.users;
-    const userIndex = req.userIndex;
+    const newCategoryName: string = req.body.categoryName;
+    const categoryId: number = Number(req.params.id);
+    const users: Schema[] = req.users;
+    const userIndex: number = req.userIndex;
     if (newCategoryName === "") {
-      return res
-        .status(303)
-        .json({ message: "Category name must not be empty" });
+      res.status(303).json({ message: "Category name must not be empty" });
+      return;
     }
     if (
-      users[userIndex].categories.find((cat) => cat.category == newCategoryName)
+      users[userIndex].categories.find(
+        (cat: CategoryType) => cat.category == newCategoryName
+      )
     ) {
-      return res.status(302).json({ message: "Category already exists" });
+      res.status(302).json({ message: "Category already exists" });
+      return;
     }
-    const categoryIndex = users[userIndex].categories.findIndex(
-      (cat) => cat.id == categoryId
+    const categoryIndex: number = users[userIndex].categories.findIndex(
+      (cat: CategoryType) => cat.id == categoryId
     );
     if (categoryIndex == -1) {
-      return res.status(500).json({
+      res.status(500).json({
         message:
           "Something went wrong from our side while deleting category,Id not found",
       });
+      return;
     }
     users[userIndex].categories[categoryIndex].category = newCategoryName;
     await writeFile(users);
-    return res.status(200).json({
+    res.status(200).json({
       message: "Category updated successfully",
       category: users[userIndex].categories[categoryIndex],
     });
+    return;
   } catch (err) {
-    return res.status(500).json({
+    res.status(500).json({
       message: err.message || "Something went wrong while creating bookmark",
     });
+    return;
   }
-}
+};
 export { addCategory, deleteCategory, getAllCategories, updateCategory };

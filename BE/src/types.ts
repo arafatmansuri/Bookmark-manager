@@ -14,7 +14,7 @@ export interface Schema {
   ];
   categories?: [
     {
-      id: Date;
+      id: number;
       category: string;
     }
   ];

@@ -43,7 +43,7 @@ const register: Handler = async (req, res): Promise<void> => {
       username: username,
       password: hashedPassword,
       bookmarks: [{}],
-      categories: [{ id: new Date(), category: "fav" }],
+      categories: [{ id: Number(new Date()), category: "fav" }],
     };
     users.push(newUser);
     await writeFile(users);
