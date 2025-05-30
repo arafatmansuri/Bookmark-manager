@@ -1,9 +1,9 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
-import { verifyJWT } from "./middlewears/user.middlewear.js";
-import bookmarkRouter from "./routes/bookmarks.route.js";
-import categoryRouter from "./routes/category.route.js";
+import { verifyJWT } from "./middlewears/user.middlewear";
+import bookmarkRouter from "./routes/bookmarks.route";
+import categoryRouter from "./routes/category.route";
 import userRouter from "./routes/user.route";
 const app = express();
 

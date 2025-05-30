@@ -42,7 +42,7 @@ async function displayAllBookmarks(req, res) {
 async function deleteBookmark(req, res) {
   try {
     const bookmarkId = Number(req.params.id);
-    if ([bookmarkId].some((feild) => feild === "")) {
+    if ([bookmarkId].some((feild) => feild === null)) {
       return res
         .status(304)
         .json({ message: "Bookmark url must not be empty" });
@@ -115,7 +115,7 @@ async function getBookmarksByCategory(req, res) {
     const user = req.user;
     if (
       !user.categories.find((cat) => cat.category === category) &&
-      !category === "All"
+      category !== "All"
     ) {
       return res.status(404).json({ message: "Category not found" });
     }
@@ -138,7 +138,7 @@ async function getBookmarksByCategory(req, res) {
 async function changeFavourites(req, res) {
   try {
     const bookmarkId = Number(req.params.id);
-    if ([bookmarkId].some((feild) => feild === "")) {
+    if ([bookmarkId].some((feild) => feild === null || undefined)) {
       return res.status(304).json({ message: "All fields are required" });
     }
     const users = req.users;
@@ -175,12 +175,12 @@ async function displayFavourite(req, res) {
     .status(200)
     .json({ message: "Favourites fetched successfully", bookmarks });
 }
-export{
+export {
   addBookmark,
-  displayAllBookmarks,
-  deleteBookmark,
-  updateBookmark,
-  getBookmarksByCategory,
   changeFavourites,
+  deleteBookmark,
+  displayAllBookmarks,
   displayFavourite,
+  getBookmarksByCategory,
+  updateBookmark,
 };

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { readFile } from "../db/fileHandler";
+import { TokenType } from "../controllers/user.contoller";
+import { readFile, Schema } from "../db/fileHandler";
 
 async function verifyJWT(req, res, next) {
   try {
@@ -8,9 +9,9 @@ async function verifyJWT(req, res, next) {
       return res.status(401).json({ message: "Token not found" });
     }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const users = await readFile();
+    const users: Schema[] = await readFile();
     const userIndex = users.findIndex(
-      (user) => user.username === decodedToken.username
+      (user) => user.username === (decodedToken as TokenType).username
     );
     if (userIndex == -1) {
       return res.status(401).json({ message: "Unauthorized" });

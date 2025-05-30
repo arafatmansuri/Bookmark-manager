@@ -1,11 +1,33 @@
+
 const fs = require("fs");
-export function readFile() {
+export interface Schema {
+  userId: Date;
+  username: string;
+  password: string;
+  bookmarks?: [
+    {
+      bId?: Date;
+      url?: string;
+      category?: string;
+      fav?: boolean;
+      createdAt?: Date;
+    }
+  ];
+  categories?: [
+    {
+      id: Date;
+      category: string;
+    }
+  ];
+  refreshToken?: string;
+}
+export function readFile<T>(): Promise<T>{
   return new Promise((resolve, reject) => {
-    fs.readFile(__dirname + "/bookmarks.json", "utf-8", (err, data) => {
+    fs.readFile(__dirname + "/bookmarks.json", "utf-8",(err, data)  => {
       if (err) {
         reject(err);
       }
-      resolve(JSON.parse(data));
+      resolve(JSON.parse(data))
     });
   });
 }
@@ -19,4 +41,3 @@ export function writeFile(data) {
     });
   });
 }
-
