@@ -12,11 +12,11 @@ app.use(cookieParser());
 app.use(cors());
 
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/category", verifyJWT, categoryRouter);
-app.use("/api/v1/bookmark", verifyJWT, bookmarkRouter);
-// app.get("/", (req, res) => {
-//   res.clearCookie();
-//   return res.send("Server running fine");
-// });
+app.use("/api/v1/category", <any>verifyJWT, categoryRouter);
+app.use("/api/v1/bookmark", <any>verifyJWT, bookmarkRouter);
+app.get("/", (req, res): any => {
+  //   res.clearCookie();
+  return res.send("Server running fine");
+});
 
 export default app;

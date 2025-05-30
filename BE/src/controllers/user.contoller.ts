@@ -1,22 +1,31 @@
 import bcrypt from "bcrypt";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { readFile, Schema, writeFile } from "../db/fileHandler";
+import { readFile, writeFile } from "../db/fileHandler";
+import { Handler, Schema } from "../types";
 async function encryptPassword(password) {
   return await bcrypt.hash(password, 10);
 }
-function comparePassword(password, enPassword) {
+function comparePassword(password: string, enPassword: string): boolean {
   return bcrypt.compareSync(password, enPassword);
 }
-function generateAccess_RereshToken(username) {
-  const accessToken = jwt.sign({ username }, process.env.JWT_SECRET, {
+function generateAccess_RereshToken(username: string): {
+  accessToken: string;
+  refreshToken: string;
+} {
+  const accessToken: string = jwt.sign({ username }, process.env.JWT_SECRET, {
     expiresIn: "15m",
   });
-  const refreshToken = jwt.sign({ username }, process.env.JWT_REFSECRET, {
-    expiresIn: "1d",
-  });
+  const refreshToken: string = jwt.sign(
+    { username },
+    process.env.JWT_REFSECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
   return { accessToken, refreshToken };
 }
-async function register(req, res) {
+const register: Handler = async (req, res) => {
   try {
     const { username, password } = req.body;
     if ([username, password].some((field) => field === "")) {
@@ -31,6 +40,7 @@ async function register(req, res) {
       userId: new Date(),
       username: username,
       password: hashedPassword,
+      bookmarks: [{}],
       categories: [{ id: new Date(), category: "fav" }],
     };
     users.push(newUser);
@@ -43,8 +53,8 @@ async function register(req, res) {
       .status(500)
       .json({ message: "Something went wrong from our side" });
   }
-}
-async function login(req, res) {
+};
+async function login(req: Request, res: Response): Promise<Response> {
   try {
     const { username, password } = req.body;
     if ([username, password].some((field) => field === "")) {
@@ -64,7 +74,7 @@ async function login(req, res) {
     const options = {
       httpOnly: true,
       secure: true,
-      sameSite: "None",
+      sameSite: <"none">"none",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     };
@@ -79,14 +89,19 @@ async function login(req, res) {
       .json({ message: "Something went wrong from our side" });
   }
 }
-async function getUser(req, res) {
+async function getUser(req: Request, res: Response): Promise<any> {
   const user = req.user;
-  res.status(200).json({ message: "User data fetched successfully", user });
+  return res
+    .status(200)
+    .json({ message: "User data fetched successfully", user });
 }
 export type TokenType = {
   username: string;
 };
-async function refreshAccessToken(req, res) {
+async function refreshAccessToken(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const IrefreshToken = req.cookies?.refreshToken;
     if (!IrefreshToken) {
@@ -111,7 +126,7 @@ async function refreshAccessToken(req, res) {
     const options = {
       httpOnly: true,
       secure: true,
-      sameSite: "None",
+      sameSite: <"none">"none",
       path: "/",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     };
@@ -126,7 +141,7 @@ async function refreshAccessToken(req, res) {
       .json({ message: err.message || "Something went wrong from our side" });
   }
 }
-async function logout(req, res) {
+function logout(req: Request, res: Response): any {
   return res
     .clearCookie("accessToken", { path: "/" })
     .clearCookie("refreshToken", { path: "/" })

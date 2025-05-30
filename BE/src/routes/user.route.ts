@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router,Response,RequestHandler } from "express";
 import {
   getUser,
   login,
@@ -7,13 +7,12 @@ import {
   register,
 } from "../controllers/user.contoller";
 import { verifyJWT } from "../middlewears/user.middlewear";
-
 const userRouter = Router();
 
 userRouter.route("/register").post(register);
-userRouter.route("/login").post(login);
-userRouter.route("/getuser").get(verifyJWT, getUser);
-userRouter.route("/refreshtoken").post(refreshAccessToken);
+userRouter.route("/login").post(<any>login);
+userRouter.route("/getuser").get(<any>verifyJWT, getUser);
+userRouter.route("/refreshtoken").post(<any>refreshAccessToken);
 userRouter.route("/logout").get(logout);
 
 export default userRouter;

@@ -1,8 +1,13 @@
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { TokenType } from "../controllers/user.contoller";
-import { readFile, Schema } from "../db/fileHandler";
-
-async function verifyJWT(req, res, next) {
+import { readFile } from "../db/fileHandler";
+import { Schema } from "../types";
+async function verifyJWT(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | NextFunction> {
   try {
     const token = req.cookies?.accessToken;
     if (!token) {

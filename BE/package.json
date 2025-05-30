@@ -8,7 +8,8 @@
     "start": "node ./dist/server.js",
     "tsc": "tsc",
     "postinstall": "npm run tsc",
-    "dev": "ts-node-dev --respawn --pretty --transpile-only ./src/server.ts"
+    "devv": "ts-node-dev --respawn --pretty --transpile-only ./src/server.ts",
+    "dev": "nodemon ./src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -28,13 +29,12 @@
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.18",
-    "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.2",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/mongoose": "^5.11.97",
     "@types/node": "^22.15.26",
     "@typescript-eslint/parser": "^8.33.0",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0"
   }
