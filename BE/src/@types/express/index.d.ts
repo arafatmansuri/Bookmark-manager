@@ -1,12 +1,9 @@
-import * as express from 'express';
-import { Schema } from '../../types';
+import { IUserDocument } from "../../models/user.model";
 //Custom Request Objects:
 declare global {
   namespace Express {
     interface Request {
-      user?: Record<Schema>;
-      users?: Record<Schema[]>;
-      userIndex?: Record<number>;
+      user?: Record<IUserDocument>;
     }
   }
 }

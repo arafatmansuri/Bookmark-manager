@@ -1,9 +1,8 @@
-import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
-import { readFile, writeFile } from "../db/fileHandler";
-import { Handler, Schema } from "../types";
+import UserModel, { IUserDocument } from "../models/user.model";
+import { Handler } from "../types";
 
 const userInputSchema = z.object({
   username: z
@@ -12,88 +11,83 @@ const userInputSchema = z.object({
     .trim(),
   password: z
     .string()
-    .min(4, { message: "Password must be atleast 4 charachter" }),
+    .regex(/[A-Z]/, {
+      message: "Pasword should include atlist 1 uppercase",
+    })
+    .regex(/[a-z]/, {
+      message: "Pasword should include atlist 1 lowercase",
+    })
+    .regex(/[0-9]/, {
+      message: "Pasword should include atlist 1 number",
+    })
+    .regex(/[^A-Za-z0-9]/, {
+      message: "Pasword should include atlist 1 special charcter",
+    })
+    .min(8, { message: "Password length shouldn't be less than 8" }),
+  email: z.string().email({ message: "invalid email address" }),
 });
 type UserInputType = z.infer<typeof userInputSchema>;
-function comparePassword(password: string, enPassword: string): boolean {
-  return bcrypt.compareSync(password, enPassword);
-}
-function generateAccess_RereshToken(username: string): {
-  accessToken: string;
-  refreshToken: string;
-} {
-  const accessToken: string = jwt.sign(
-    { username },
-    <string>process.env.JWT_SECRET,
-    {
-      expiresIn: "15m",
-    }
-  );
-  const refreshToken: string = jwt.sign(
-    { username },
-    <string>process.env.JWT_REFSECRET,
-    {
-      expiresIn: "1d",
-    }
-  );
-  return { accessToken, refreshToken };
-}
 const register: Handler = async (req, res): Promise<void> => {
   try {
     const parsedBody = userInputSchema.safeParse(req.body);
-    if (parsedBody.error) {
+    if (!parsedBody.success) {
       res.status(301).json({
-        message: parsedBody.error.message || "Username/password compulsory",
+        message:
+          parsedBody.error.errors[0].message || "Username/password compulsory",
       });
       return;
     }
-    const users: Schema[] = await readFile();
-    if (users.find((user) => user.username === parsedBody.data.username)) {
-      res.status(303).json({ message: "Username already exists" });
+    const user = await UserModel.findOne<IUserDocument>({
+      $or: [
+        { username: parsedBody.data.username, email: parsedBody.data.email },
+      ],
+    });
+    if (user) {
+      res.status(303).json({ message: "Username/email already exists" });
       return;
     }
-    const newUser: Schema = {
-      userId: new Date(),
+    const newUser: IUserDocument = await UserModel.create({
       username: parsedBody.data.username,
       password: parsedBody.data.password,
-      bookmarks: [{}],
-      categories: [{ id: Number(new Date()), category: "fav" }],
-    };
-    users.push(newUser);
-    await writeFile(users);
-    res.status(200).json({ message: "User registred successfull", newUser });
+      email: parsedBody.data.email,
+    });
+    res.status(200).json({ message: "User registred successful", newUser });
     return;
-  } catch (err) {
-    res.status(500).json({ message: "Something went wrong from our side" });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ message: err.message || "Something went wrong from our side" });
     return;
   }
 };
 async function login(req: Request, res: Response): Promise<void> {
   try {
     const parsedBody = userInputSchema.safeParse(req.body);
-    if (parsedBody.error) {
+    if (!parsedBody.success) {
       res.status(301).json({
-        message: parsedBody.error.message || "Username/password compulsory",
+        message:
+          parsedBody.error.errors[0].message || "Username/password compulsory",
       });
       return;
     }
-    const users: Schema[] = await readFile();
-    if (!users.find((user) => user.username === parsedBody.data.username)) {
-      res.status(404).json({ message: "User not found" });
+    const user = await UserModel.findOne<IUserDocument>({
+      $and: [
+        { username: parsedBody.data.username, email: parsedBody.data.email },
+      ],
+    });
+    if (!user) {
+      res
+        .status(404)
+        .json({ message: "User not found with this username/email" });
       return;
     }
-    const userIndex = users.findIndex(
-      (user) => user.username === parsedBody.data.username
-    );
-    if (!comparePassword(parsedBody.data.password, users[userIndex].password)) {
+    if (!user.comparePassword(parsedBody.data.password)) {
       res.status(404).json({ message: "Invalid password" });
       return;
     }
-    const { accessToken, refreshToken } = generateAccess_RereshToken(
-      parsedBody.data.username
-    );
-    users[userIndex].refreshToken = refreshToken;
-    await writeFile(users);
+    const { accessToken, refreshToken } = user.generateAccessAndRereshToken();
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
     const options = {
       httpOnly: true,
       secure: true,
@@ -135,19 +129,14 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-    const users: Schema[] = await readFile();
-    const user = users.findIndex(
-      (user) => user.username === (decodedToken as TokenType).username
-    );
-    if (user == -1 || users[user].refreshToken !== IrefreshToken) {
+    const user = await UserModel.findById<IUserDocument>(decodedToken._id);
+    if (!user) {
       res.status(401).json({ message: "Invalid refresh Token" });
       return;
     }
-    const { accessToken, refreshToken } = generateAccess_RereshToken(
-      users[user].username
-    );
-    users[user].refreshToken = refreshToken;
-    await writeFile(users);
+    const { accessToken, refreshToken } = user.generateAccessAndRereshToken();
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
     const options = {
       httpOnly: true,
       secure: true,

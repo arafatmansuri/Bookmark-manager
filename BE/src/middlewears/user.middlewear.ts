@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { TokenType } from "../controllers/user.contoller";
-import { readFile } from "../db/fileHandler";
-import { Schema } from "../types";
+import UserModel from "../models/user.model";
 async function verifyJWT(
   req: Request,
   res: Response,
@@ -15,17 +13,12 @@ async function verifyJWT(
       return;
     }
     const decodedToken = jwt.verify(token, <string>process.env.JWT_SECRET);
-    const users: Schema[] = await readFile();
-    const userIndex: number = users.findIndex(
-      (user) => user.username === (decodedToken as TokenType).username
-    );
-    if (userIndex == -1) {
+    const user = await UserModel.findById(decodedToken._id);
+    if (!user) {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-    req.users = users;
-    req.user = users[userIndex];
-    req.userIndex = userIndex;
+    req.user = user;
     next();
     return;
   } catch (err: any) {
@@ -36,3 +29,4 @@ async function verifyJWT(
   }
 }
 export { verifyJWT };
+

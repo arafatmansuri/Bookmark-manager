@@ -1,14 +1,13 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import mongoose, { Schema } from "mongoose";
-interface IUser {
-  userId: Date;
+import mongoose, { Schema,Document } from "mongoose";
+export interface IUser {
   username: string;
   password: string;
   email: string;
   refreshToken?: string;
 }
-interface IUserDocument extends IUser {
+export interface IUserDocument extends IUser,Document {
   comparePassword: (inputPassword: string) => boolean;
   generateAccessAndRereshToken: () => {
     accessToken: string;
@@ -16,11 +15,6 @@ interface IUserDocument extends IUser {
   };
 }
 const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>({
-  userId: {
-    type: Date,
-    required: true,
-    unique: true,
-  },
   username: {
     type: String,
     required: true,
