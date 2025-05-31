@@ -1,11 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-
-export interface IBookmark extends Document {
-  url: string;
-  category: Schema.Types.ObjectId;
-  fav?: boolean;
-  createdBy: Schema.Types.ObjectId;
-}
+import mongoose, { Schema } from "mongoose";
+import { IBookmark } from "../types";
 
 const bookmarkSchema: Schema<IBookmark> = new Schema<IBookmark>(
   {

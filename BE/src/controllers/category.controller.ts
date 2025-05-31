@@ -1,6 +1,6 @@
 import { z } from "zod";
-import CategoryModel, { ICategory } from "../models/category.model";
-import { Handler } from "../types";
+import CategoryModel from "../models/category.model";
+import { Handler, ICategory, IUserDocument } from "../types";
 const str = z
   .string()
   .min(3, { message: "Cateory name must contain atleast 3 char" });
@@ -15,10 +15,11 @@ const addCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const user = req.user;
-    const category = await CategoryModel.findOne<ICategory>({
-      $and: [{ category: parsedData.data, createdBy: user?._id }],
-    });
+    const user: IUserDocument = req.user;
+    const category: ICategory | null =
+      await CategoryModel.findOne<ICategory>({
+        $and: [{ category: parsedData.data, createdBy: user?._id }],
+      });
     if (category) {
       res.status(302).json({ message: "Category already exists" });
       return;
@@ -41,8 +42,8 @@ const addCategory: Handler = async (req, res): Promise<void> => {
 
 const getAllCategories: Handler = async (req, res): Promise<void> => {
   try {
-    const user = req.user;
-    const categories = await CategoryModel.find<ICategory>({ createdBy: user?._id });
+    const user:IUserDocument = req.user;
+    const categories: ICategory[] = await CategoryModel.find<ICategory>({ createdBy: user?._id });
     res.status(200).json({
       message: "Categories fetched successfully",
       username: user?.username,
@@ -59,7 +60,7 @@ const getAllCategories: Handler = async (req, res): Promise<void> => {
 const deleteCategory: Handler = async (req, res): Promise<void> => {
   try {
     const categoryId = req.params.id;
-    const category = await CategoryModel.findByIdAndDelete<ICategory>(
+    const category: ICategory | null = await CategoryModel.findByIdAndDelete<ICategory>(
       categoryId
     );
     if (!category) {
@@ -84,7 +85,7 @@ const deleteCategory: Handler = async (req, res): Promise<void> => {
 const updateCategory: Handler = async (req, res): Promise<void> => {
   try {
     const categoryId = req.params.id;
-    const user = req.user;
+    const user:IUserDocument = req.user;
     const parsedData = str.safeParse(req.body.newCategoryName);
     if (!parsedData.success) {
       res.status(303).json({
@@ -94,7 +95,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const category = await CategoryModel.findOne<ICategory>({
+    const category: ICategory | null = await CategoryModel.findOne<ICategory>({
       $and: [{ category: parsedData.data, createdBy: user?._id }],
     });
     if (category) {
@@ -103,15 +104,16 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const updatedCategory = await CategoryModel.findByIdAndUpdate<ICategory>(
-      categoryId,
-      {
-        $set: {
-          category: parsedData.data,
+    const updatedCategory: ICategory | null =
+      await CategoryModel.findByIdAndUpdate<ICategory>(
+        categoryId,
+        {
+          $set: {
+            category: parsedData.data,
+          },
         },
-      },
-      { new: true }
-    );
+        { new: true }
+      );
     if (!updatedCategory) {
       res.status(500).json({
         message:

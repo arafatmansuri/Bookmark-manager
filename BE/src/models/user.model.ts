@@ -1,19 +1,8 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import mongoose, { Schema,Document } from "mongoose";
-export interface IUser {
-  username: string;
-  password: string;
-  email: string;
-  refreshToken?: string;
-}
-export interface IUserDocument extends IUser,Document {
-  comparePassword: (inputPassword: string) => boolean;
-  generateAccessAndRereshToken: () => {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
+import mongoose, { Schema } from "mongoose";
+import { IUserDocument } from "../types";
+
 const UserSchema: Schema<IUserDocument> = new Schema<IUserDocument>({
   username: {
     type: String,

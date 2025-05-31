@@ -1,7 +1,7 @@
 import { z } from "zod";
-import BookmarkModel, { IBookmark } from "../models/bookmark.model";
-import CategoryModel, { ICategory } from "../models/category.model";
-import { Handler } from "../types";
+import BookmarkModel from "../models/bookmark.model";
+import CategoryModel from "../models/category.model";
+import { Handler, IBookmark, ICategory, IUserDocument } from "../types";
 const bookmarkSchema = z.object({
   bookmarkUrl: z.string().min(8, { message: "url must be of atleast 8 chars" }),
   category: z.string(),
@@ -9,7 +9,7 @@ const bookmarkSchema = z.object({
 type BookmarkInput = z.infer<typeof bookmarkSchema>;
 const addBookmark: Handler = async (req, res): Promise<void> => {
   try {
-    const user = req.user;
+    const user: IUserDocument = req.user;
     const bookmarkInput = bookmarkSchema.safeParse(req.body);
     if (!bookmarkInput.success) {
       res.status(304).json({
@@ -19,7 +19,7 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const category = await CategoryModel.findOne<ICategory>({
+    const category: ICategory | null = await CategoryModel.findOne<ICategory>({
       $and: [{ category: bookmarkInput.data.category, createdBy: user?._id }],
     });
     if (!category) {
@@ -44,7 +44,7 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
 };
 const displayAllBookmarks: Handler = async (req, res): Promise<void> => {
   try {
-    const user = req.user;
+    const user: IUserDocument = req.user;
     const bookmarks: IBookmark[] = await BookmarkModel.find<IBookmark>({
       createdBy: user?._id,
     });
@@ -64,9 +64,8 @@ const displayAllBookmarks: Handler = async (req, res): Promise<void> => {
 const deleteBookmark: Handler = async (req, res): Promise<void> => {
   try {
     const bookmarkId = req.params.id;
-    const bookmark = await BookmarkModel.findByIdAndDelete<IBookmark>(
-      bookmarkId
-    );
+    const bookmark: IBookmark | null =
+      await BookmarkModel.findByIdAndDelete<IBookmark>(bookmarkId);
     if (!bookmark) {
       res.status(500).json({
         message:
@@ -87,7 +86,7 @@ const deleteBookmark: Handler = async (req, res): Promise<void> => {
 };
 const updateBookmark: Handler = async (req, res): Promise<void> => {
   try {
-    const user = req.user;
+    const user: IUserDocument = req.user;
     const bookmarkId = req.params.id;
     const bookmarkInput = bookmarkSchema.safeParse(req.body);
     if (!bookmarkInput.success) {
@@ -105,15 +104,13 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
       res.status(500).json({ message: "Category not found" });
       return;
     }
-    const updatedBookmark = await BookmarkModel.findByIdAndUpdate<IBookmark>(
-      bookmarkId,
-      {
+    const updatedBookmark: IBookmark | null =
+      await BookmarkModel.findByIdAndUpdate<IBookmark>(bookmarkId, {
         $set: {
           url: bookmarkInput.data.bookmarkUrl,
           category: category._id,
         },
-      }
-    );
+      });
     if (!updatedBookmark) {
       res.status(500).json({
         message:
@@ -194,7 +191,7 @@ const changeFavourites: Handler = async (req, res): Promise<void> => {
 };
 const displayFavourite: Handler = async (req, res): Promise<void> => {
   try {
-    const user = req.user;
+    const user: IUserDocument = req.user;
     const bookmarks: IBookmark[] = await BookmarkModel.find<IBookmark>({
       $and: [
         {

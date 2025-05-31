@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
-import UserModel, { IUserDocument } from "../models/user.model";
-import { Handler } from "../types";
+import UserModel from "../models/user.model";
+import { Handler, IUserDocument } from "../types";
 
 const userInputSchema = z.object({
   username: z
@@ -37,7 +37,7 @@ const register: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const user = await UserModel.findOne<IUserDocument>({
+    const user: IUserDocument | null = await UserModel.findOne<IUserDocument>({
       $or: [
         { username: parsedBody.data.username, email: parsedBody.data.email },
       ],
@@ -70,7 +70,7 @@ async function login(req: Request, res: Response): Promise<void> {
       });
       return;
     }
-    const user = await UserModel.findOne<IUserDocument>({
+    const user: IUserDocument | null = await UserModel.findOne<IUserDocument>({
       $and: [
         { username: parsedBody.data.username, email: parsedBody.data.email },
       ],
@@ -107,7 +107,7 @@ async function login(req: Request, res: Response): Promise<void> {
   }
 }
 async function getUser(req: Request, res: Response): Promise<void> {
-  const user = req.user;
+  const user: IUserDocument = req.user;
   res.status(200).json({ message: "User data fetched successfully", user });
   return;
 }
@@ -116,12 +116,12 @@ export type TokenType = {
 };
 async function refreshAccessToken(req: Request, res: Response): Promise<void> {
   try {
-    const IrefreshToken = req.cookies?.refreshToken;
+    const IrefreshToken:string = req.cookies?.refreshToken;
     if (!IrefreshToken) {
       res.status(401).json({ message: "Refresh token is empty" });
       return;
     }
-    const decodedToken = jwt.verify(
+    const decodedToken: jwt.JwtPayload = jwt.verify(
       IrefreshToken,
       <string>process.env.JWT_REFSECRET
     );
@@ -129,7 +129,7 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-    const user = await UserModel.findById<IUserDocument>(decodedToken._id);
+    const user: IUserDocument | null = await UserModel.findById<IUserDocument>(decodedToken._id);
     if (!user) {
       res.status(401).json({ message: "Invalid refresh Token" });
       return;
