@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { writeFile } from "../db/fileHandler";
-import { BookmarkType, CategoryType, Handler, Schema } from "../types";
+import BookmarkModel, { IBookmark } from "../models/bookmark.model";
+import CategoryModel, { ICategory } from "../models/category.model";
+import { Handler } from "../types";
 const bookmarkSchema = z.object({
   bookmarkUrl: z.string().min(8, { message: "url must be of atleast 8 chars" }),
   category: z.string(),
@@ -8,33 +9,28 @@ const bookmarkSchema = z.object({
 type BookmarkInput = z.infer<typeof bookmarkSchema>;
 const addBookmark: Handler = async (req, res): Promise<void> => {
   try {
+    const user = req.user;
     const bookmarkInput = bookmarkSchema.safeParse(req.body);
-    if (bookmarkInput.error) {
+    if (!bookmarkInput.success) {
       res.status(304).json({
         message:
-          bookmarkInput.error.message || "Bookmark url must not be empty",
+          bookmarkInput.error.errors[0].message ||
+          "Bookmark url must not be empty",
       });
       return;
     }
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    if (
-      !users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category === bookmarkInput.data.category
-      )
-    ) {
-      res.status(404).json({ message: "Category not found" });
+    const category = await CategoryModel.findOne<ICategory>({
+      $and: [{ category: bookmarkInput.data.category, createdBy: user?._id }],
+    });
+    if (!category) {
+      res.status(500).json({ message: "Category not found" });
       return;
     }
-    const newBookmark: BookmarkType = {
-      id: Date.now(),
+    const newBookmark: IBookmark = await BookmarkModel.create({
       url: bookmarkInput.data.bookmarkUrl,
-      category: bookmarkInput.data.category,
-      fav: false,
-      createdAt: new Date(),
-    };
-    users[userIndex].bookmarks.push(newBookmark);
-    await writeFile(users);
+      category: category._id,
+      createdBy: user?._id,
+    });
     res
       .status(200)
       .json({ message: "Bookmark created successfully", newBookmark });
@@ -46,42 +42,41 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
     return;
   }
 };
-const displayAllBookmarks: Handler = (req, res): void => {
-  const user: Schema = req.user;
-  const bookmarks: BookmarkType[] = user.bookmarks;
-  res.status(200).json({
-    message: "Bookmarks fetched successfully",
-    user: user.username,
-    bookmarks,
-  });
-  return;
+const displayAllBookmarks: Handler = async (req, res): Promise<void> => {
+  try {
+    const user = req.user;
+    const bookmarks: IBookmark[] = await BookmarkModel.find<IBookmark>({
+      createdBy: user?._id,
+    });
+    res.status(200).json({
+      message: "Bookmarks fetched successfully",
+      user: user?.username,
+      bookmarks,
+    });
+    return;
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ message: err.message || "Something went wrong from our side" });
+    return;
+  }
 };
 const deleteBookmark: Handler = async (req, res): Promise<void> => {
   try {
-    const bookmarkId: number = Number(req.params.id);
-    if ([bookmarkId].some((feild) => feild === null)) {
-      res.status(304).json({ message: "Bookmark url must not be empty" });
-      return;
-    }
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    const bookmarkIndex: number = users[userIndex].bookmarks.findIndex(
-      (bm: BookmarkType) => bm.id === bookmarkId
+    const bookmarkId = req.params.id;
+    const bookmark = await BookmarkModel.findByIdAndDelete<IBookmark>(
+      bookmarkId
     );
-    if (bookmarkIndex == -1) {
+    if (!bookmark) {
       res.status(500).json({
         message:
           "Something went wrong from our side while deleting category,Id not found",
       });
       return;
     }
-    const deletedBookmark: BookmarkType =
-      users[userIndex].bookmarks[bookmarkIndex];
-    users[userIndex].bookmarks.splice(bookmarkIndex, 1);
-    await writeFile(users);
     res
       .status(200)
-      .json({ message: "Bookmark deleted successfully", deletedBookmark });
+      .json({ message: "Bookmark deleted successfully", bookmark });
     return;
   } catch (err: any) {
     res.status(500).json({
@@ -92,43 +87,43 @@ const deleteBookmark: Handler = async (req, res): Promise<void> => {
 };
 const updateBookmark: Handler = async (req, res): Promise<void> => {
   try {
-    const bookmarkId: number = Number(req.params.id);
+    const user = req.user;
+    const bookmarkId = req.params.id;
     const bookmarkInput = bookmarkSchema.safeParse(req.body);
-    if (bookmarkInput.error) {
+    if (!bookmarkInput.success) {
       res.status(304).json({
         message:
-          bookmarkInput.error.message || "Bookmark url must not be empty",
+          bookmarkInput.error.errors[0].message ||
+          "Bookmark url must not be empty",
       });
       return;
     }
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    if (
-      !users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category === bookmarkInput.data.category
-      )
-    ) {
-      res.status(404).json({ message: "Category not found" });
+    const category: ICategory | null = await CategoryModel.findOne<ICategory>({
+      $and: [{ category: bookmarkInput.data.category, createdBy: user?._id }],
+    });
+    if (!category) {
+      res.status(500).json({ message: "Category not found" });
       return;
     }
-    const bookmarkIndex: number = users[userIndex].bookmarks.findIndex(
-      (bm: BookmarkType) => bm.id === bookmarkId
+    const updatedBookmark = await BookmarkModel.findByIdAndUpdate<IBookmark>(
+      bookmarkId,
+      {
+        $set: {
+          url: bookmarkInput.data.bookmarkUrl,
+          category: category._id,
+        },
+      }
     );
-    if (bookmarkIndex == -1) {
+    if (!updatedBookmark) {
       res.status(500).json({
         message:
           "Something went wrong from our side while updating category,Id not found",
       });
       return;
     }
-    users[userIndex].bookmarks[bookmarkIndex].url =
-      bookmarkInput.data.bookmarkUrl;
-    users[userIndex].bookmarks[bookmarkIndex].category =
-      bookmarkInput.data.category;
-    await writeFile(users);
     res.status(200).json({
       message: "Bookmark updated successfully",
-      updatedBookmark: users[userIndex].bookmarks[bookmarkIndex],
+      updatedBookmark,
     });
     return;
   } catch (err: any) {
@@ -140,29 +135,23 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
 };
 const getBookmarksByCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const category: string = req.params.category;
-    if ([category].some((feild) => feild === "")) {
-      res.status(304).json({ message: "All fields are required" });
+    const categoryId = req.params.categoryId;
+    const category: ICategory | null = await CategoryModel.findById<ICategory>(
+      categoryId
+    );
+    if (!category) {
+      res.status(500).json({ message: "Category not found" });
       return;
     }
-    const user: Schema = req.user;
-    if (
-      !user.categories.find((cat: CategoryType) => cat.category === category) &&
-      category !== "All"
-    ) {
-      res.status(404).json({ message: "Category not found" });
+    let bookmarks: IBookmark[] = await BookmarkModel.find<IBookmark>({
+      category: category._id,
+    });
+    if (!bookmarks) {
+      res.status(404).json({ message: "No bookmarks found for this category" });
       return;
-    }
-    let bookmarks: BookmarkType[] = [];
-    if (category === "All") {
-      bookmarks = user.bookmarks;
-    } else {
-      bookmarks = user.bookmarks.filter(
-        (bm: BookmarkType) => bm.category === category
-      );
     }
     res.status(200).json({
-      message: `Bookmarks fetched for ${category} category`,
+      message: `Bookmarks fetched for ${category.category} category`,
       bookmarks,
     });
     return;
@@ -175,29 +164,25 @@ const getBookmarksByCategory: Handler = async (req, res): Promise<void> => {
 };
 const changeFavourites: Handler = async (req, res): Promise<void> => {
   try {
-    const bookmarkId: number = Number(req.params.id);
+    const bookmarkId = req.params.id;
     if ([bookmarkId].some((feild) => feild === null || undefined)) {
       res.status(304).json({ message: "All fields are required" });
       return;
     }
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    const bookmarkIndex: number = users[userIndex].bookmarks.findIndex(
-      (bm: BookmarkType) => bm.id === bookmarkId
+    const bookmark: IBookmark | null = await BookmarkModel.findById<IBookmark>(
+      bookmarkId
     );
-    if (bookmarkIndex == -1) {
+    if (!bookmark) {
       res.status(500).json({
         message:
           "Something went wrong from our side while updating category,Id not found",
       });
       return;
     }
-    users[userIndex].bookmarks[bookmarkIndex].fav =
-      !users[userIndex].bookmarks[bookmarkIndex].fav;
-    await writeFile(users);
+    bookmark.fav = !bookmark.fav;
     res.status(200).json({
-      message: `Favourite status changed to ${users[userIndex].bookmarks[bookmarkIndex].fav}`,
-      bookmark: users[userIndex].bookmarks[bookmarkIndex],
+      message: `Favourite status changed success`,
+      bookmark,
     });
     return;
   } catch (err: any) {
@@ -208,14 +193,30 @@ const changeFavourites: Handler = async (req, res): Promise<void> => {
   }
 };
 const displayFavourite: Handler = async (req, res): Promise<void> => {
-  const user: Schema = req.user;
-  const bookmarks = user.bookmarks.filter(
-    (bm: BookmarkType) => bm.fav === true
-  );
-  res
-    .status(200)
-    .json({ message: "Favourites fetched successfully", bookmarks });
-  return;
+  try {
+    const user = req.user;
+    const bookmarks: IBookmark[] = await BookmarkModel.find<IBookmark>({
+      $and: [
+        {
+          fav: true,
+          createdBy: user?._id,
+        },
+      ],
+    });
+    if (!bookmarks) {
+      res.status(404).json({ message: "Favourites is empty" });
+      return;
+    }
+    res
+      .status(200)
+      .json({ message: "Favourites fetched successfully", bookmarks });
+    return;
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ message: err.message || "Something went wrong from our side" });
+    return;
+  }
 };
 export {
   addBookmark,

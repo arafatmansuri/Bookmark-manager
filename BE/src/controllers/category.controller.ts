@@ -1,5 +1,5 @@
 import { z } from "zod";
-import CategoryModel from "../models/category.model";
+import CategoryModel, { ICategory } from "../models/category.model";
 import { Handler } from "../types";
 const str = z
   .string()
@@ -16,14 +16,14 @@ const addCategory: Handler = async (req, res): Promise<void> => {
       return;
     }
     const user = req.user;
-    const category = await CategoryModel.findOne({
+    const category = await CategoryModel.findOne<ICategory>({
       $and: [{ category: parsedData.data, createdBy: user?._id }],
     });
     if (category) {
       res.status(302).json({ message: "Category already exists" });
       return;
     }
-    const newCategory = await CategoryModel.create({
+    const newCategory: ICategory = await CategoryModel.create({
       category: parsedData.data,
       createdBy: user?._id,
     });
@@ -42,7 +42,7 @@ const addCategory: Handler = async (req, res): Promise<void> => {
 const getAllCategories: Handler = async (req, res): Promise<void> => {
   try {
     const user = req.user;
-    const categories = await CategoryModel.find({ createdBy: user?._id });
+    const categories = await CategoryModel.find<ICategory>({ createdBy: user?._id });
     res.status(200).json({
       message: "Categories fetched successfully",
       username: user?.username,
@@ -59,7 +59,9 @@ const getAllCategories: Handler = async (req, res): Promise<void> => {
 const deleteCategory: Handler = async (req, res): Promise<void> => {
   try {
     const categoryId = req.params.id;
-    const category = await CategoryModel.findByIdAndDelete(categoryId);
+    const category = await CategoryModel.findByIdAndDelete<ICategory>(
+      categoryId
+    );
     if (!category) {
       res.status(500).json({
         message:
@@ -92,7 +94,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const category = await CategoryModel.findOne({
+    const category = await CategoryModel.findOne<ICategory>({
       $and: [{ category: parsedData.data, createdBy: user?._id }],
     });
     if (category) {
@@ -101,7 +103,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const updatedCategory = await CategoryModel.findByIdAndUpdate(
+    const updatedCategory = await CategoryModel.findByIdAndUpdate<ICategory>(
       categoryId,
       {
         $set: {
