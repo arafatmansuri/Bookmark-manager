@@ -15,9 +15,6 @@ const userInputSchema = z.object({
     .min(4, { message: "Password must be atleast 4 charachter" }),
 });
 type UserInputType = z.infer<typeof userInputSchema>;
-async function encryptPassword(password: string) {
-  return await bcrypt.hash(password, 10);
-}
 function comparePassword(password: string, enPassword: string): boolean {
   return bcrypt.compareSync(password, enPassword);
 }
@@ -55,11 +52,10 @@ const register: Handler = async (req, res): Promise<void> => {
       res.status(303).json({ message: "Username already exists" });
       return;
     }
-    const hashedPassword = await encryptPassword(parsedBody.data.password);
     const newUser: Schema = {
       userId: new Date(),
       username: parsedBody.data.username,
-      password: hashedPassword,
+      password: parsedBody.data.password,
       bookmarks: [{}],
       categories: [{ id: Number(new Date()), category: "fav" }],
     };
