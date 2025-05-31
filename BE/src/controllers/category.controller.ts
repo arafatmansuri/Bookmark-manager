@@ -1,30 +1,32 @@
 import { z } from "zod";
-import { writeFile } from "../db/fileHandler";
-import { CategoryType, Handler, Schema } from "../types";
-const str = z.string().min(3,{"message":"Cateory name must contain atleast 3 char"});
+import CategoryModel from "../models/category.model";
+import { Handler } from "../types";
+const str = z
+  .string()
+  .min(3, { message: "Cateory name must contain atleast 3 char" });
 const addCategory: Handler = async (req, res): Promise<void> => {
   try {
     const parsedData = str.safeParse(req.body.categoryName);
-    if (parsedData.error) {
-      res.status(303).json({ message: parsedData.error.message || "Category name must not be empty" });
+    if (!parsedData.success) {
+      res.status(303).json({
+        message:
+          parsedData.error.errors[0].message ||
+          "Category name must not be empty",
+      });
       return;
     }
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    if (
-      users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category == parsedData.data
-      )
-    ) {
+    const user = req.user;
+    const category = await CategoryModel.findOne({
+      $and: [{ category: parsedData.data, createdBy: user?._id }],
+    });
+    if (category) {
       res.status(302).json({ message: "Category already exists" });
       return;
     }
-    const newCategory: CategoryType = {
-      id: Number(new Date()),
+    const newCategory = await CategoryModel.create({
       category: parsedData.data,
-    };
-    users[userIndex].categories.push(newCategory);
-    await writeFile(users);
+      createdBy: user?._id,
+    });
     res.status(200).json({
       message: "New category added sucessfully",
       category: newCategory,
@@ -38,37 +40,36 @@ const addCategory: Handler = async (req, res): Promise<void> => {
 };
 
 const getAllCategories: Handler = async (req, res): Promise<void> => {
-  const user: Schema = req.user;
-  const categories: CategoryType[] = user.categories;
-  res.status(200).json({
-    message: "Categories fetched successfully",
-    username: user.username,
-    categories,
-  });
+  try {
+    const user = req.user;
+    const categories = await CategoryModel.find({ createdBy: user?._id });
+    res.status(200).json({
+      message: "Categories fetched successfully",
+      username: user?.username,
+      categories,
+    });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ message: err.message || "Something went wrong from our side" });
+    return;
+  }
 };
 
 const deleteCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const categoryId: number = parseInt(req.params.id);
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    const categoryIndex: number = users[userIndex].categories.findIndex(
-      (cat: CategoryType) => cat.id == categoryId
-    );
-    if (categoryIndex == -1) {
+    const categoryId = req.params.id;
+    const category = await CategoryModel.findByIdAndDelete(categoryId);
+    if (!category) {
       res.status(500).json({
         message:
           "Something went wrong from our side while deleting category,Id not found",
       });
       return;
     }
-    const deletedCategory: CategoryType =
-      users[userIndex].categories[categoryIndex];
-    users[userIndex].categories.splice(categoryIndex, 1);
-    await writeFile(users);
     res
       .status(200)
-      .json({ message: "Category Deleted successfully", deletedCategory });
+      .json({ message: "Category Deleted successfully", category });
     return;
   } catch (err) {
     res.status(500).json({
@@ -80,42 +81,45 @@ const deleteCategory: Handler = async (req, res): Promise<void> => {
 
 const updateCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const categoryId: number = Number(req.params.id);
+    const categoryId = req.params.id;
+    const user = req.user;
     const parsedData = str.safeParse(req.body.newCategoryName);
-    if (parsedData.error) {
-      res
-        .status(303)
-        .json({
-          message:
-            parsedData.error.message || "Category name must not be empty",
-        });
-      return;
-    }
-    const users: Schema[] = req.users;
-    const userIndex: number = req.userIndex;
-    if (
-      users[userIndex].categories.find(
-        (cat: CategoryType) => cat.category == parsedData.data
-      )
-    ) {
-      res.status(302).json({ message: "Category already exists" });
-      return;
-    }
-    const categoryIndex: number = users[userIndex].categories.findIndex(
-      (cat: CategoryType) => cat.id == categoryId
-    );
-    if (categoryIndex == -1) {
-      res.status(500).json({
+    if (!parsedData.success) {
+      res.status(303).json({
         message:
-          "Something went wrong from our side while deleting category,Id not found",
+          parsedData.error.errors[0].message ||
+          "Category name must not be empty",
       });
       return;
     }
-    users[userIndex].categories[categoryIndex].category = parsedData.data;
-    await writeFile(users);
+    const category = await CategoryModel.findOne({
+      $and: [{ category: parsedData.data, createdBy: user?._id }],
+    });
+    if (category) {
+      res.status(404).json({
+        message: "given category already exist",
+      });
+      return;
+    }
+    const updatedCategory = await CategoryModel.findByIdAndUpdate(
+      categoryId,
+      {
+        $set: {
+          category: parsedData.data,
+        },
+      },
+      { new: true }
+    );
+    if (!updatedCategory) {
+      res.status(500).json({
+        message:
+          "Something went wrong from our side while updating category,Id not found",
+      });
+      return;
+    }
     res.status(200).json({
       message: "Category updated successfully",
-      category: users[userIndex].categories[categoryIndex],
+      updatedCategory,
     });
     return;
   } catch (err: any) {

@@ -5,6 +5,7 @@ interface IBookmark extends Document {
   category: Schema.Types.ObjectId;
   fav: boolean;
   createdAt: Date;
+  createdBy: Schema.Types.ObjectId;
 }
 
 const bookmarkSchema: Schema<IBookmark> = new Schema<IBookmark>({
@@ -24,6 +25,10 @@ const bookmarkSchema: Schema<IBookmark> = new Schema<IBookmark>({
   createdAt: {
     type: Date,
     default: Date.now(),
+  },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 
