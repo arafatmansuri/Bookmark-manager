@@ -24,7 +24,7 @@ const userInputSchema = z.object({
       message: "Pasword should include atlist 1 special charcter",
     })
     .min(8, { message: "Password length shouldn't be less than 8" }),
-  email: z.string().email({ message: "invalid email address" }),
+  email: z.string().email({ message: "invalid email address" }).optional(),
 });
 type UserInputType = z.infer<typeof userInputSchema>;
 const register: Handler = async (req, res): Promise<void> => {
@@ -116,7 +116,7 @@ export type TokenType = {
 };
 async function refreshAccessToken(req: Request, res: Response): Promise<void> {
   try {
-    const IrefreshToken:string = req.cookies?.refreshToken;
+    const IrefreshToken: string = req.cookies?.refreshToken;
     if (!IrefreshToken) {
       res.status(401).json({ message: "Refresh token is empty" });
       return;
@@ -129,7 +129,9 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-    const user: IUserDocument | null = await UserModel.findById<IUserDocument>(decodedToken._id);
+    const user: IUserDocument | null = await UserModel.findById<IUserDocument>(
+      decodedToken._id
+    );
     if (!user) {
       res.status(401).json({ message: "Invalid refresh Token" });
       return;

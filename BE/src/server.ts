@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3001;
 
 connectDB()
   .then((data: string) => {
-    console.log("mongoDB connected", data);
+    console.log("mongoDB connected");
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

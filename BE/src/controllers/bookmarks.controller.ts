@@ -132,7 +132,7 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
 };
 const getBookmarksByCategory: Handler = async (req, res): Promise<void> => {
   try {
-    const categoryId = req.params.categoryId;
+    const categoryId = req.params.id;
     const category: ICategory | null = await CategoryModel.findById<ICategory>(
       categoryId
     );
@@ -177,6 +177,7 @@ const changeFavourites: Handler = async (req, res): Promise<void> => {
       return;
     }
     bookmark.fav = !bookmark.fav;
+    await bookmark.save({ validateBeforeSave: false });
     res.status(200).json({
       message: `Favourite status changed success`,
       bookmark,
