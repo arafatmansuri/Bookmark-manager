@@ -6,14 +6,15 @@ interface ButtonProps {
   startIcon?: React.ReactElement;
   endIcon?: React.ReactElement;
   color?: string;
+  classes?: string;
 }
 const variantClasses: { primary: string; secondary: string } = {
   primary: `bg-blue-600 hover:bg-blue-700 font-semibold`,
-  secondary: `dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-gray-700 bg-gray- hover:bg-gray-200 border-transparent border-2 `,
+  secondary: `dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-gray-700 bg-gray-300 hover:bg-gray-200 border-transparent`,
 };
 const sizeClassess: { sm: string; md: string; lg: string } = {
   sm: `px-3 py-2 rounded-full text-sm font-medium focus:bg-blue-100 dark:focus:bg-blue-900 focus:text-blue-700 dark:focus:text-blue-300 focus:border-blue-300 dark:focus:border-blue-600`,
-  md: `font-medium px-5 py-2`,
+  md: `font-medium px-5 py-3`,
   lg: `w-full py-3 px-4`,
 };
 const commonClasses: string = `rounded-xl shadow-lg hover:shadow-xl cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 `;
@@ -24,11 +25,12 @@ export function Button({
   onClick,
   startIcon,
   color,
-  endIcon
+  endIcon,
+  classes,
 }: ButtonProps) {
   return (
     <button
-      className={`${commonClasses} ${variantClasses[variant]} ${sizeClassess[size]}`}
+      className={`${commonClasses} ${variantClasses[variant]} ${sizeClassess[size]} ${classes}`}
       onClick={onClick}
     >
       {color && (
