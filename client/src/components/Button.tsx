@@ -15,7 +15,7 @@ const variantClasses: { primary: string; secondary: string } = {
 const sizeClassess: { sm: string; md: string; lg: string } = {
   sm: `px-5 py-2 rounded-full text-sm font-medium focus:bg-blue-100 dark:focus:bg-blue-900 focus:text-blue-700 dark:focus:text-blue-300 focus:border-blue-300 dark:focus:border-blue-600 border-2`,
   md: `px-5 py-2 rounded-xl`,
-  lg: `w-full py-3 px-4 rounded-xl`,
+  lg: `py-3 px-4 rounded-xl`,
 };
 const commonClasses: string = `shadow-lg hover:shadow-xl cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 `;
 export function Button({
