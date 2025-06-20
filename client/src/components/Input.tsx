@@ -3,8 +3,11 @@ interface InputPorps {
   isLabel: boolean;
   labelText?: string;
   type: HTMLInputTypeAttribute;
-  startIcon: React.ReactElement;
+  startIcon?: React.ReactElement;
   placeholder?: string;
+  classes?: string;
+  isFull?: boolean;
+  width?: string;
 }
 export function Input({
   isLabel,
@@ -12,9 +15,12 @@ export function Input({
   type,
   placeholder,
   startIcon,
+  classes,
+  isFull = true,
+  width,
 }: InputPorps) {
   return (
-    <div className="w-full">
+    <div className={`${isFull ? "w-full" : width}`}>
       {isLabel && (
         <label
           htmlFor=""
@@ -28,9 +34,9 @@ export function Input({
         <input
           type={type}
           placeholder={placeholder}
-          className={`w-full border pl-10 pr-4 py-3 border-gray-300 dark:border-gray-600 rounded-xl 
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                         focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200`}
+          className={`w-full border border-gray-300 dark:border-gray-600 rounded-xl bg-white text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+            classes ? classes : "pl-10 pr-4 py-3 dark:bg-gray-700"
+          }`}
         />
       </div>
     </div>

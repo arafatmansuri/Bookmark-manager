@@ -5,24 +5,41 @@ interface ButtonProps {
   onClick?: () => void;
   startIcon?: React.ReactElement;
   endIcon?: React.ReactElement;
+  color?: string;
 }
 const variantClasses: { primary: string; secondary: string } = {
   primary: `bg-blue-600 hover:bg-blue-700 font-semibold`,
-  secondary: `dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-gray-700`,
+  secondary: `dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-gray-700 bg-gray- hover:bg-gray-200 border-transparent border-2 `,
 };
 const sizeClassess: { sm: string; md: string; lg: string } = {
-  sm: ``,
+  sm: `px-3 py-2 rounded-full text-sm font-medium focus:bg-blue-100 dark:focus:bg-blue-900 focus:text-blue-700 dark:focus:text-blue-300 focus:border-blue-300 dark:focus:border-blue-600`,
   md: `font-medium px-5 py-2`,
   lg: `w-full py-3 px-4`,
 };
 const commonClasses: string = `rounded-xl shadow-lg hover:shadow-xl cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 `;
-export function Button({ text, variant, size, onClick,startIcon }: ButtonProps) {
+export function Button({
+  text,
+  variant,
+  size,
+  onClick,
+  startIcon,
+  color,
+  endIcon
+}: ButtonProps) {
   return (
     <button
       className={`${commonClasses} ${variantClasses[variant]} ${sizeClassess[size]}`}
       onClick={onClick}
     >
-      {startIcon}{text}
+      {color && (
+        <div
+          className={`w-3 h-3 rounded-full`}
+          style={{ backgroundColor: color }}
+        ></div>
+      )}{" "}
+      {startIcon}
+      {text}
+      {endIcon}
     </button>
   );
 }

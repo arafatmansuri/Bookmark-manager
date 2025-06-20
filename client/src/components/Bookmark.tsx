@@ -21,22 +21,21 @@ const monthName = {
   "12": "Dec",
 };
 export function Bookmark({ category, date, title, url }: BookmarkProps) {
-  const day = date.getDate();
   return (
-    <div className="flex flex-col gap-7 justify-center dark:bg-gray-800 rounded-md px-6 py-6 w-72">
-      {category && (
-        <div className="flex gap-2">
-          {category.map((cat) => (
-            <span
-              className={`px-4 py-0.5 rounded-md text-xs font-medium`}
-              style={{ backgroundColor: `${cat.color}` }}
-            >
-              {cat.name}
-            </span>
-          ))}
-        </div>
-      )}
+    <div className="flex flex-col gap-7 justify-center dark:bg-gray-800 rounded-md px-6 py-6 w-72 hover:-translate-y-1 transition-transform duration-300 delay-50 dark:border-gray-700 border border-gray-300">
       <div>
+        {category && (
+          <div className="flex gap-2 mb-4">
+            {category.map((cat) => (
+              <span
+                className={`px-4 py-1 rounded-md text-xs font-medium`}
+                style={{ backgroundColor: `${cat.color}` }}
+              >
+                {cat.name}
+              </span>
+            ))}
+          </div>
+        )}
         <h1 className="text-lg font-semibold">{title}</h1>
         <h4 className="text-sm dark:text-gray-400 text-gray-500">{url}</h4>
       </div>
@@ -47,12 +46,12 @@ export function Bookmark({ category, date, title, url }: BookmarkProps) {
         {date.getHours() > 12 ? "PM" : "AM"}
       </span>
       <div className="flex justify-between items-center">
-        <div className="flex gap-4">
+        <div className="flex gap-4 in-hover:cursor-pointer">
           <Heart className="h-4 w-4 text-gray-500" />{" "}
           <Copy className="h-4 w-4 text-gray-500" />{" "}
           <ExternalLink className="h-4 w-4 text-gray-500" />
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 in-hover:cursor-pointer">
           <Pencil className="h-4 w-4 text-gray-500" />{" "}
           <Trash2 className="h-4 w-4 text-gray-500" />{" "}
         </div>
