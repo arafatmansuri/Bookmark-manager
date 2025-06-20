@@ -1,4 +1,4 @@
-import { Pen, Plus, Trash, Trash2, X } from "lucide-react";
+import { Pen, Plus, Trash2, X } from "lucide-react";
 import { Button } from "./Button";
 import { Input } from "./Input";
 

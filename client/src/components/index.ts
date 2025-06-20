@@ -4,3 +4,5 @@ export { Input } from "./Input";
 export { TotalCard } from "./TotalCard";
 export { ManageCategory } from "./ManageCategory";
 export { AddBookmark } from "./AddBookmark";
+export { Main } from "./Main";
+export { CategoryOverview } from "./CategoryOverview";
