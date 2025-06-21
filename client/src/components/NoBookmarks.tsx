@@ -7,8 +7,8 @@ export function NoBookmarks() {
       <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full inline-block mb-4">
         <Bookmark className="h-12 w-12 text-gray-400 dark:text-gray-500" />
       </div>
-      <h1 className="font-semibold text-xl">No bookmarks yet</h1>
-      <p className="text-gray-400 w-96 text-center">
+      <h1 className="font-semibold md:text-xl text-lg">No bookmarks yet</h1>
+      <p className="text-gray-400 md:w-96 text-sm text-center">
         Start by adding your first bookmark to organize your favorite websites.
       </p>
       <Button

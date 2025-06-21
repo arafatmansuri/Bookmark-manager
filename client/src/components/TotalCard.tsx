@@ -6,6 +6,7 @@ interface TotalCardProps {
   classes?: string;
   color?: string;
   totalCountStyle?: string;
+  width?:string;
 }
 export function TotalCard({
   text,
@@ -14,14 +15,15 @@ export function TotalCard({
   classes,
   color,
   totalCountStyle,
+  width
 }: TotalCardProps) {
   return (
     <div
       className={`flex items-center gap-4 rounded-xl p-6 dark:border-gray-700 border-gray-200 ${
         color
           ? color
-          : "dark:bg-gray-800 w-64 dark:text-gray-400 text-gray-600 border shadow-sm"
-      }`}
+          : "dark:bg-gray-800 dark:text-gray-400 text-gray-600 border shadow-sm"
+      } ${width ? width : ""}`}
     >
       <div className={`${classes} p-2 h-10 rounded-lg`}>{icon}</div>
       <div>

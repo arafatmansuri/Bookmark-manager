@@ -7,6 +7,7 @@ interface ButtonProps {
   endIcon?: React.ReactElement;
   color?: string;
   classes?: string;
+  type:"submit" | "reset" | "button" | undefined;
 }
 const variantClasses: { primary: string; secondary: string } = {
   primary: `bg-blue-600 hover:bg-blue-700 font-semibold`,
@@ -27,9 +28,11 @@ export function Button({
   color,
   endIcon,
   classes,
+  type
 }: ButtonProps) {
   return (
     <button
+    type={type}
       className={`${commonClasses} ${variantClasses[variant]} ${sizeClassess[size]} ${classes}`}
       onClick={onClick}
     >

@@ -1,4 +1,4 @@
-export { Bookmark } from "./Bookmark";
+export { BookmarkCard } from "./Bookmark";
 export { Button } from "./Button";
 export { Input } from "./Input";
 export { TotalCard } from "./TotalCard";

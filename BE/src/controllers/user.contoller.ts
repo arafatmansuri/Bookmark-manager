@@ -37,11 +37,10 @@ const register: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const user: IUserDocument | null = await UserModel.findOne<IUserDocument>({
-      $or: [
-        { username: parsedBody.data.username, email: parsedBody.data.email },
-      ],
-    });
+    const user: IUserDocument | null =
+      await UserModel.findOne<IUserDocument | null>({
+        username: parsedBody.data.username,
+      });
     if (user) {
       res.status(303).json({ message: "Username/email already exists" });
       return;
@@ -51,7 +50,9 @@ const register: Handler = async (req, res): Promise<void> => {
       password: parsedBody.data.password,
       email: parsedBody.data.email,
     });
-    res.status(200).json({ message: "User registred successful", newUser });
+    res
+      .status(200)
+      .json({ message: "User registred successful", user: newUser });
     return;
   } catch (err: any) {
     res
@@ -71,9 +72,7 @@ async function login(req: Request, res: Response): Promise<void> {
       return;
     }
     const user: IUserDocument | null = await UserModel.findOne<IUserDocument>({
-      $and: [
-        { username: parsedBody.data.username, email: parsedBody.data.email },
-      ],
+      $and: [{ username: parsedBody.data.username }],
     });
     if (!user) {
       res

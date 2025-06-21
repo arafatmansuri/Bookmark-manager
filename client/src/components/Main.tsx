@@ -47,7 +47,7 @@ export function Main() {
           <Filter className="h-5 w-5" />
           <span className="font-medium">Filter:</span>
         </span>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
             <Button size="sm" text="All" variant="secondary"/>
             <Button size="sm" text="General" color="gray" variant="secondary"/>
         </div>

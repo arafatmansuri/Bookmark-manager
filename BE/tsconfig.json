@@ -5,9 +5,9 @@
     "target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
 
     /* Modules */
-    "module": "Node16" /* Specify what module code is generated. */,
+    "module": "node16" /* Specify what module code is generated. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    "moduleResolution": "node16" /* Specify how TypeScript looks up a file from a given module specifier. */,
+    "moduleResolution": "nodenext" /* Specify how TypeScript looks up a file from a given module specifier. */,
     /* JavaScript Support */
     "allowJs": true,
     "rootDir": "./",
@@ -20,7 +20,12 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "typeRoots": ["./src/@types", "./node_modules/@types"],
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "ts-node-dev": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   },
   "include": ["./src/**/*"]
 }

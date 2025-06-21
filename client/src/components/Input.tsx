@@ -8,6 +8,9 @@ interface InputPorps {
   classes?: string;
   isFull?: boolean;
   width?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  register?: any;
+  isFocus?:boolean
 }
 export function Input({
   isLabel,
@@ -18,6 +21,8 @@ export function Input({
   classes,
   isFull = true,
   width,
+  register,
+  isFocus=false
 }: InputPorps) {
   return (
     <div className={`${isFull ? "w-full" : width}`}>
@@ -32,11 +37,13 @@ export function Input({
       <div className="relative">
         {startIcon}
         <input
+        autoFocus={isFocus}
           type={type}
           placeholder={placeholder}
           className={`w-full border border-gray-300 dark:border-gray-600 rounded-xl bg-white text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
             classes ? classes : "pl-10 pr-4 py-3 dark:bg-gray-700"
           }`}
+          {...register}
         />
       </div>
     </div>
