@@ -3,6 +3,7 @@ import BookmarkModel from "../models/bookmark.model";
 import CategoryModel from "../models/category.model";
 import { Handler, IBookmark, ICategory, IUserDocument } from "../types";
 const bookmarkSchema = z.object({
+  bookmarkTitle: z.string(),
   bookmarkUrl: z.string().min(8, { message: "url must be of atleast 8 chars" }),
   category: z.string(),
 });
@@ -27,13 +28,14 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
       return;
     }
     const newBookmark: IBookmark = await BookmarkModel.create({
+      title: bookmarkInput.data.bookmarkTitle,
       url: bookmarkInput.data.bookmarkUrl,
       category: category._id,
       createdBy: user?._id,
     });
     res
       .status(200)
-      .json({ message: "Bookmark created successfully", newBookmark });
+      .json({ message: "Bookmark created successfully", bookmark:newBookmark });
     return;
   } catch (err: any) {
     res.status(500).json({
@@ -107,6 +109,7 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
     const updatedBookmark: IBookmark | null =
       await BookmarkModel.findByIdAndUpdate<IBookmark>(bookmarkId, {
         $set: {
+          title: bookmarkInput.data.bookmarkTitle,
           url: bookmarkInput.data.bookmarkUrl,
           category: category._id,
         },
@@ -120,7 +123,7 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
     }
     res.status(200).json({
       message: "Bookmark updated successfully",
-      updatedBookmark,
+      bookmark:updatedBookmark,
     });
     return;
   } catch (err: any) {

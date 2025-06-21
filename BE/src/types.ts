@@ -59,6 +59,7 @@ export interface IUserDocument extends IUser,Document {
 }
 
 export interface IBookmark extends Document {
+  title:string;
   url: string;
   category: Schema.Types.ObjectId;
   fav?: boolean;

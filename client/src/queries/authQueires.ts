@@ -15,7 +15,7 @@ async function authRequest({
   credentials,
   method,
 }: UserFormData): Promise<UserData> {
-  const response = await axios(`${BACKEND_URL}/api/v1/user/${endpoint}`, {
+  const response = await axios(`${BACKEND_URL}/user/${endpoint}`, {
     method,
     data,
     withCredentials: credentials,

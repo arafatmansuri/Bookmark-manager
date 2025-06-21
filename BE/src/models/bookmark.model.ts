@@ -3,6 +3,10 @@ import { IBookmark } from "../types";
 
 const bookmarkSchema: Schema<IBookmark> = new Schema<IBookmark>(
   {
+    title: {
+      type: String,
+      required: true,
+    },
     url: {
       type: String,
       required: true,

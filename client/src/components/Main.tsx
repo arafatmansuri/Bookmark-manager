@@ -1,8 +1,11 @@
 import { BarChart3, Filter, Heart, Pen, Plus, Search } from "lucide-react";
+import { useSetRecoilState } from "recoil";
+import { modalAtom } from "../store/ModalState";
 import { Button } from "./Button";
 import { Input } from "./Input";
 
 export function Main() {
+  const setModalOpen = useSetRecoilState(modalAtom);
   return (
     <div className="flex flex-col dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 gap-6 justify-center">
       <div className="flex flex-wrap lg:flex-row gap-4">
@@ -18,24 +21,29 @@ export function Main() {
           classes="pl-10 py-3 dark:bg-gray-800"
         />
         <Button
+          type="button"
           size="md"
           text="Favorites Only"
           variant="secondary"
           startIcon={<Heart className="h-4 w-4" />}
         />
         <Button
+          type="button"
           size="md"
           text="View Categories"
           variant="secondary"
           startIcon={<BarChart3 className="h-4 w-4" />}
         />
         <Button
+          type="button"
           size="md"
           text="Manage Categories"
           variant="secondary"
           startIcon={<Pen className="h-4 w-4" />}
         />
         <Button
+          type="button"
+          onClick={() => setModalOpen({ modal: "bookmark", open: true })}
           size="md"
           text="Add Bookmark"
           variant="primary"
@@ -48,8 +56,8 @@ export function Main() {
           <span className="font-medium">Filter:</span>
         </span>
         <div className="flex flex-wrap gap-2">
-            <Button size="sm" text="All" variant="secondary"/>
-            <Button size="sm" text="General" color="gray" variant="secondary"/>
+          <Button size="sm" text="All" variant="secondary" />
+          <Button size="sm" text="General" color="gray" variant="secondary" />
         </div>
       </div>
     </div>
