@@ -5,6 +5,7 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import {
   AddBookmark,
   BookmarkCard,
+  CategoryOverview,
   Header,
   Main,
   TotalCard,
@@ -77,9 +78,7 @@ function Dashboard() {
     }
   }, [bookmarkQuery.status]);
   return (
-    <div
-      className={`text-black bg-gradient-to-br from-blue-50 to-indigo-100 dark dark:text-white dark:from-gray-900 dark:to-gray-800 min-h-screen p-8 flex items-center justify-center`}
-    >
+    <div className={`p-8 flex items-center justify-center`}>
       <div
         className={`flex flex-col gap-10 ${
           isModalOpen.open ? "opacity-60" : "opacity-100"
@@ -122,6 +121,7 @@ function Dashboard() {
         </div>
       </div>
       <AddBookmark />
+      <CategoryOverview />
     </div>
   );
 }

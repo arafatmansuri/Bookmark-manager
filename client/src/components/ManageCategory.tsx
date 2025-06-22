@@ -4,7 +4,7 @@ import { Input } from "./Input";
 
 export const ManageCategory = () => {
   return (
-    <div className="absolute top-12 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-10 w-80 p-4 flex flex-col gap-4">
+    <div className="absolute top-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-10 w-80 p-4 flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-gray-900 dark:text-white">
           Manage Categories
@@ -23,13 +23,14 @@ export const ManageCategory = () => {
           width="w-[85%]"
         />
         <Button
+          type="button"
           size="sm"
           text=""
           variant="primary"
           startIcon={<Plus className="h-5 w-5" />}
         />
       </div>
-      <div className="flex flex-col gap-2 max-h-64 space-y-2 overflow-y-auto p-2">
+      <div className="flex flex-col gap-2 max-h-52 space-y-2 overflow-y-auto p-2">
         <div className="flex justify-between items-center">
           <span className="text-sm dark:text-gray-300 text-gray-700">
             General

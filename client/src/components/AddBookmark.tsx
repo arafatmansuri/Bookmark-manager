@@ -10,7 +10,7 @@ export function AddBookmark() {
     <div
       className={`${
         isModalOpen.open && isModalOpen.modal == "bookmark" ? "flex" : "hidden"
-      } flex-col gap-2 dark:bg-gray-800 bg-white rounded-2xl shadow-2xl max-w-md min-w-[37%] bg-opacity-50 absolute`}
+      } flex-col gap-2 dark:bg-gray-800 bg-white rounded-2xl shadow-2xl max-w-md min-w-[80%] md:min-w-[37%] bg-opacity-50 absolute`}
     >
       <div className="flex justify-between items-center p-6 border-b border-gray-700">
         <h1 className="font-semibold text-xl">Add New Bookmark</h1>
