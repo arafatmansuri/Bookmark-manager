@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import CategoryModel from "../models/category.model";
 import UserModel from "../models/user.model";
 import { Handler, IUserDocument } from "../types";
 
@@ -49,6 +50,10 @@ const register: Handler = async (req, res): Promise<void> => {
       username: parsedBody.data.username,
       password: parsedBody.data.password,
       email: parsedBody.data.email,
+    });
+    await CategoryModel.create({
+      category: "General",
+      createdBy: newUser?._id,
     });
     res
       .status(200)

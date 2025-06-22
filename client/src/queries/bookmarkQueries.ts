@@ -1,8 +1,13 @@
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type UseQueryResult,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 
-interface BookmarkInput {
+export interface BookmarkInput {
   endpoint: string;
   method: "GET" | "POST" | "PUT" | "DELETE";
   data?: { bookmarkTitle: string; bookmarkUrl: string; category: string };
@@ -28,6 +33,11 @@ const bookmarkRequest = async <T>({
     method,
     data,
     withCredentials: true,
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
   });
   if (endpoint == "display") {
     return response.data;
@@ -42,9 +52,23 @@ export const useBookmarkQuery = <T>({
   method,
 }: BookmarkInput): UseQueryResult<T, unknown> => {
   return useQuery({
-    queryKey: ["useBookmarkQuery"],
+    queryKey: ["bookmark"],
     queryFn: async () => {
-      return bookmarkRequest<T>({ endpoint, method });
+      return await bookmarkRequest<T>({ endpoint, method });
+    },
+    retry: false,
+  });
+};
+
+export const useBookamrkMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ["bookmarkMutation"],
+    mutationFn: async ({ endpoint, method, data }: BookmarkInput) => {
+      return await bookmarkRequest<BookmarkData>({ endpoint, method, data });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bookmark"] });
     },
   });
 };

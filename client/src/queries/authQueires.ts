@@ -48,5 +48,10 @@ export const useAuthMutation = () => {
     }: UserFormData) => {
       return await authRequest({ method, data, endpoint, credentials });
     },
+      onError: (error) => {
+        if (!error?.response) {
+          throw new Error("Network Error");
+        }
+    }
   });
 };

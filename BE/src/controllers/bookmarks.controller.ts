@@ -13,7 +13,7 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
     const user: IUserDocument = req.user;
     const bookmarkInput = bookmarkSchema.safeParse(req.body);
     if (!bookmarkInput.success) {
-      res.status(304).json({
+      res.status(413).json({
         message:
           bookmarkInput.error.errors[0].message ||
           "Bookmark url must not be empty",
@@ -21,7 +21,7 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
       return;
     }
     const category: ICategory | null = await CategoryModel.findOne<ICategory>({
-      $and: [{ category: bookmarkInput.data.category, createdBy: user?._id }],
+      $and: [{ _id: bookmarkInput.data.category, createdBy: user?._id }],
     });
     if (!category) {
       res.status(500).json({ message: "Category not found" });

@@ -1,12 +1,16 @@
 import { BarChart3, Filter, Heart, Pen, Plus, Search } from "lucide-react";
-import { useSetRecoilState } from "recoil";
-import { modalAtom } from "../store/ModalState";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { categoryAtom } from "../store/categoryState";
+import { manageCategoryAtom, modalAtom } from "../store/ModalState";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { ManageCategory } from "./ManageCategory";
 
 export function Main() {
   const setModalOpen = useSetRecoilState(modalAtom);
+  const categories = useRecoilValue(categoryAtom);
+  const [isManageCategoryOpen, setIsManageCategoryOpen] =
+    useRecoilState(manageCategoryAtom);
   return (
     <div className="flex flex-col dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 gap-6 justify-center">
       <div className="flex flex-wrap lg:flex-row gap-4">
@@ -49,8 +53,9 @@ export function Main() {
             text="Manage Categories"
             variant="secondary"
             startIcon={<Pen className="h-4 w-4" />}
+            onClick={() => setIsManageCategoryOpen(true)}
           />
-          <ManageCategory/>
+          {isManageCategoryOpen && <ManageCategory />}
         </div>
         <div>
           <Button
@@ -70,13 +75,16 @@ export function Main() {
         </span>
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" text="All" variant="secondary" />
-          <Button
-            type="button"
-            size="sm"
-            text="General"
-            color="gray"
-            variant="secondary"
-          />
+          {categories.map((category) => (
+            <Button
+              key={category._id}
+              type="button"
+              size="sm"
+              text={category.category}
+              color="gray"
+              variant="secondary"
+            />
+          ))}
         </div>
       </div>
     </div>

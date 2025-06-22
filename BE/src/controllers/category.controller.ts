@@ -123,7 +123,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
     }
     res.status(200).json({
       message: "Category updated successfully",
-      updatedCategory,
+      category:updatedCategory,
     });
     return;
   } catch (err: any) {

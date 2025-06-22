@@ -1,6 +1,9 @@
 import { Clock, Copy, ExternalLink, Heart, Pencil, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { useBookamrkMutation } from "../queries/bookmarkQueries";
 
 interface BookmarkProps {
+  id: string;
   title: string;
   url: string;
   date: Date;
@@ -20,7 +23,25 @@ const monthName = {
   "11": "Nov",
   "12": "Dec",
 };
-export function BookmarkCard({ category, date, title, url }: BookmarkProps) {
+export function BookmarkCard({
+  category,
+  date,
+  title,
+  url,
+  id,
+}: BookmarkProps) {
+  const bookmarkMutation = useBookamrkMutation();
+  function deleteBookmark(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
+    bookmarkMutation.mutate({
+      method: "DELETE",
+      endpoint: `delete/${e.currentTarget.id}`,
+    });
+  }
+  useEffect(() => {
+    if (bookmarkMutation.status == "success") {
+      console.log("Bookmark Deleted");
+    }
+  }, [bookmarkMutation.status]);
   return (
     <div className="flex flex-col gap-7 justify-end dark:bg-gray-800 rounded-md px-6 py-6 hover:-translate-y-1 transition-transform duration-300 delay-50 dark:border-gray-700 border border-gray-300">
       <div>
@@ -54,7 +75,11 @@ export function BookmarkCard({ category, date, title, url }: BookmarkProps) {
         </div>
         <div className="flex gap-4 in-hover:cursor-pointer">
           <Pencil className="h-4 w-4 text-gray-500" />{" "}
-          <Trash2 className="h-4 w-4 text-gray-500" />{" "}
+          <Trash2
+            className="h-4 w-4 text-gray-500"
+            id={id}
+            onClick={deleteBookmark}
+          />{" "}
         </div>
       </div>
     </div>

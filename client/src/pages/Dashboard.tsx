@@ -1,13 +1,14 @@
 import { Bookmark, Heart, Search } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   AddBookmark,
   BookmarkCard,
   CategoryOverview,
   Header,
   Main,
+  NoBookmarks,
   TotalCard,
 } from "../components";
 import { useAuthMutation, useGetUserQuery } from "../queries/authQueires";
@@ -15,15 +16,18 @@ import {
   useBookmarkQuery,
   type BookmarkData,
 } from "../queries/bookmarkQueries";
+import { useCategoryQuery } from "../queries/categoryQueries";
 import { bookmarkAtom } from "../store/bookmarkState";
+import { categoryAtom } from "../store/categoryState";
 import { modalAtom } from "../store/ModalState";
 import { userAtom } from "../store/userState";
 
 function Dashboard() {
   const isRefreshed = useRef<boolean>(false);
+  const isModalOpen = useRecoilValue(modalAtom);
   const setUser = useSetRecoilState(userAtom);
-  const [isModalOpen, setIsModalOpen] = useRecoilState(modalAtom);
   const [bookmarks, setBookmarks] = useRecoilState(bookmarkAtom);
+  const [categories, setCategories] = useRecoilState(categoryAtom);
   const userQuery = useGetUserQuery({
     credentials: true,
     endpoint: "getuser",
@@ -36,16 +40,17 @@ function Dashboard() {
     endpoint: "display",
     method: "GET",
   });
+  const categoryQuery = useCategoryQuery();
   const refreshTokenMutation = useAuthMutation();
   const navigate = useNavigate();
   useEffect(() => {
     if (userQuery.status == "success") {
-      console.log(userQuery.data);
       setUser(userQuery.data);
     }
     if (
-      userQuery.status == "error" &&
-      userQuery.error?.response.status == 401 &&
+      (userQuery.status == "error" ||
+        bookmarkQuery.status == "error" ||
+        categoryQuery.status == "error") &&
       !isRefreshed.current
     ) {
       isRefreshed.current = true;
@@ -67,16 +72,21 @@ function Dashboard() {
     }
   }, [
     userQuery.status,
-    userQuery.error?.response.status,
     isRefreshed.current,
     refreshTokenMutation,
+    bookmarkQuery.status,
+    categoryQuery.status,
   ]);
   useEffect(() => {
     if (bookmarkQuery.status == "success") {
-      console.log(bookmarkQuery.data);
       setBookmarks(bookmarkQuery.data.bookmarks);
     }
-  }, [bookmarkQuery.status]);
+  }, [bookmarkQuery.data?.bookmarks, bookmarkQuery.status]);
+  useEffect(() => {
+    if (categoryQuery.status == "success") {
+      setCategories(categoryQuery.data);
+    }
+  }, [categoryQuery.status, categoryQuery.data]);
   return (
     <div className={`p-8 flex items-center justify-center`}>
       <div
@@ -101,7 +111,7 @@ function Dashboard() {
           <TotalCard
             icon={<Search />}
             text="Categories"
-            totalCount={1}
+            totalCount={categories.length}
             classes="dark:bg-green-800 bg-green-600 dark:text-green-400 text-green-100"
           />
         </div>
@@ -109,16 +119,21 @@ function Dashboard() {
         <span className=" text-gray-400">
           Showing 0 of {bookmarks.length} bookmarks
         </span>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {bookmarks.map((bookmark) => (
-            <BookmarkCard
-              date={new Date(bookmark.createdAt)}
-              title={bookmark.title}
-              url={bookmark.url}
-              key={bookmark._id}
-            />
-          ))}
-        </div>
+        {bookmarks.length <= 0 ? (
+          <NoBookmarks />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {bookmarks.map((bookmark) => (
+              <BookmarkCard
+                id={bookmark._id}
+                date={new Date(bookmark.createdAt)}
+                title={bookmark.title}
+                url={bookmark.url}
+                key={bookmark._id}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <AddBookmark />
       <CategoryOverview />
