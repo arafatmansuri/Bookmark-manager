@@ -17,8 +17,13 @@ import {
   type BookmarkData,
 } from "../queries/bookmarkQueries";
 import { useCategoryQuery } from "../queries/categoryQueries";
-import { bookmarkAtom } from "../store/bookmarkState";
+import {
+  bookmarkAtom,
+  bookmarkCategorySelector,
+  bookmarkFavouriteSelector,
+} from "../store/bookmarkState";
 import { categoryAtom } from "../store/categoryState";
+import { favoriteAtom, filterAtom } from "../store/filterState";
 import { modalAtom } from "../store/ModalState";
 import { userAtom } from "../store/userState";
 
@@ -27,7 +32,11 @@ function Dashboard() {
   const isModalOpen = useRecoilValue(modalAtom);
   const setUser = useSetRecoilState(userAtom);
   const [bookmarks, setBookmarks] = useRecoilState(bookmarkAtom);
+  const bookmarkFavSelector = useRecoilValue(bookmarkFavouriteSelector);
+  const bookmarkCatSelector = useRecoilValue(bookmarkCategorySelector);
   const [categories, setCategories] = useRecoilState(categoryAtom);
+  const [isFave, setIsFav] = useRecoilState(favoriteAtom);
+  const categoryFilter = useRecoilValue(filterAtom);
   const userQuery = useGetUserQuery({
     credentials: true,
     endpoint: "getuser",
@@ -117,21 +126,53 @@ function Dashboard() {
         </div>
         <Main />
         <span className=" text-gray-400">
-          Showing 0 of {bookmarks.length} bookmarks
+          Showing{" "}
+          <span>
+            {!isFave && !categoryFilter.category && bookmarks.length}
+            {isFave && bookmarkFavSelector.length}
+            {categoryFilter.category && bookmarkCatSelector.length}
+          </span>{" "}
+          of {bookmarks.length} bookmarks
         </span>
         {bookmarks.length <= 0 ? (
           <NoBookmarks />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {bookmarks.map((bookmark) => (
-              <BookmarkCard
-                id={bookmark._id}
-                date={new Date(bookmark.createdAt)}
-                title={bookmark.title}
-                url={bookmark.url}
-                key={bookmark._id}
-              />
-            ))}
+            {!isFave &&
+              !categoryFilter.category &&
+              bookmarks.map((bookmark) => (
+                <BookmarkCard
+                  id={bookmark._id}
+                  date={new Date(bookmark.createdAt)}
+                  title={bookmark.title}
+                  url={bookmark.url}
+                  key={bookmark._id}
+                  category={bookmark.category}
+                />
+              ))}
+            {isFave &&
+              bookmarkFavSelector.map((bookmark) => (
+                <BookmarkCard
+                  id={bookmark._id}
+                  date={new Date(bookmark.createdAt)}
+                  title={bookmark.title}
+                  url={bookmark.url}
+                  key={bookmark._id}
+                  category={bookmark.category}
+                />
+              ))}
+
+            {categoryFilter.category &&
+              bookmarkCatSelector.map((bookmark) => (
+                <BookmarkCard
+                  id={bookmark._id}
+                  date={new Date(bookmark.createdAt)}
+                  title={bookmark.title}
+                  url={bookmark.url}
+                  key={bookmark._id}
+                  category={bookmark.category}
+                />
+              ))}
           </div>
         )}
       </div>

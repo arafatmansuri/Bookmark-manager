@@ -1,6 +1,6 @@
 interface ButtonProps {
   text: string;
-  variant: "primary" | "secondary";
+  variant: "primary" | "secondary" | "favorite";
   size: "sm" | "md" | "lg";
   onClick?: () => void;
   startIcon?: React.ReactElement;
@@ -9,9 +9,10 @@ interface ButtonProps {
   classes?: string;
   type:"submit" | "reset" | "button" | undefined;
 }
-const variantClasses: { primary: string; secondary: string } = {
+const variantClasses: { primary: string; secondary: string,favorite:string } = {
   primary: `bg-blue-600 hover:bg-blue-700 font-semibold`,
-  secondary: `dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-gray-700 bg-gray-300 hover:bg-gray-200 border-transparent font-medium`,
+  secondary: `dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300 text-gray-700 bg-gray-300 hover:bg-gray-200 border border-transparent font-medium`,
+  favorite: `dark:bg-red-900 border border-red-700 text-red-400 font-medium`,
 };
 const sizeClassess: { sm: string; md: string; lg: string } = {
   sm: `px-5 py-2 rounded-full text-sm font-medium focus:bg-blue-100 dark:focus:bg-blue-900 focus:text-blue-700 dark:focus:text-blue-300 focus:border-blue-300 dark:focus:border-blue-600 border-2`,

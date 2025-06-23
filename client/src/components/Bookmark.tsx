@@ -1,13 +1,15 @@
 import { Clock, Copy, ExternalLink, Heart, Pencil, Trash2 } from "lucide-react";
 import { useEffect } from "react";
+import { useRecoilValue } from "recoil";
 import { useBookamrkMutation } from "../queries/bookmarkQueries";
+import { categoryAtom } from "../store/categoryState";
 
 interface BookmarkProps {
   id: string;
   title: string;
   url: string;
   date: Date;
-  category?: { name: string; color: string }[];
+  category?: string;
 }
 const monthName = {
   "1": "Jan",
@@ -31,6 +33,7 @@ export function BookmarkCard({
   id,
 }: BookmarkProps) {
   const bookmarkMutation = useBookamrkMutation();
+  const categories = useRecoilValue(categoryAtom);
   function deleteBookmark(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     bookmarkMutation.mutate({
       method: "DELETE",
@@ -45,17 +48,11 @@ export function BookmarkCard({
   return (
     <div className="flex flex-col gap-7 justify-end dark:bg-gray-800 rounded-md px-6 py-6 hover:-translate-y-1 transition-transform duration-300 delay-50 dark:border-gray-700 border border-gray-300">
       <div>
-        {category && (
-          <div className="flex gap-2 mb-4">
-            {category.map((cat, index) => (
-              <span
-                key={index}
-                className={`px-4 py-1 rounded-md text-xs font-medium`}
-                style={{ backgroundColor: `${cat.color}` }}
-              >
-                {cat.name}
-              </span>
-            ))}
+        {categories.find((c) => c._id == category)?.category && (
+          <div
+            className={`flex gap-2 mb-4 py-0.5 px-3 text-sm rounded-full w-fit bg-gray-500`}
+          >
+            {categories.find((c) => c._id == category)?.category}
           </div>
         )}
         <h1 className="text-lg font-semibold">{title}</h1>

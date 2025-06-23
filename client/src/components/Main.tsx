@@ -1,6 +1,7 @@
 import { BarChart3, Filter, Heart, Pen, Plus, Search } from "lucide-react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { categoryAtom } from "../store/categoryState";
+import { favoriteAtom, filterAtom } from "../store/filterState";
 import { manageCategoryAtom, modalAtom } from "../store/ModalState";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -9,8 +10,10 @@ import { ManageCategory } from "./ManageCategory";
 export function Main() {
   const setModalOpen = useSetRecoilState(modalAtom);
   const categories = useRecoilValue(categoryAtom);
+  const setCategoryFilter = useSetRecoilState(filterAtom);
   const [isManageCategoryOpen, setIsManageCategoryOpen] =
     useRecoilState(manageCategoryAtom);
+  const [isFav, setIsFav] = useRecoilState(favoriteAtom);
   return (
     <div className="flex flex-col dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 gap-6 justify-center">
       <div className="flex flex-wrap lg:flex-row gap-4">
@@ -32,8 +35,9 @@ export function Main() {
             type="button"
             size="md"
             text="Favorites Only"
-            variant="secondary"
+            variant={isFav ? "favorite" : "secondary"}
             startIcon={<Heart className="h-4 w-4" />}
+            onClick={() => setIsFav((p) => !p)}
           />
         </div>
         <div>
@@ -74,7 +78,13 @@ export function Main() {
           <span className="font-medium">Filter:</span>
         </span>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" size="sm" text="All" variant="secondary" />
+          <Button
+            type="button"
+            size="sm"
+            text="All"
+            variant="secondary"
+            onClick={() => setCategoryFilter({ category: null })}
+          />
           {categories.map((category) => (
             <Button
               key={category._id}
@@ -83,6 +93,7 @@ export function Main() {
               text={category.category}
               color="gray"
               variant="secondary"
+              onClick={() => setCategoryFilter({ category: category._id })}
             />
           ))}
         </div>

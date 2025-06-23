@@ -1,13 +1,13 @@
 import { BarChart3, Folder, Heart, X } from "lucide-react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { bookmarkAtom } from "../store/bookmarkState";
+import { categoryAtom } from "../store/categoryState";
 import { modalAtom } from "../store/ModalState";
 import { TotalCard } from "./TotalCard";
-import { categoryAtom } from "../store/categoryState";
-import { bookmarkAtom } from "../store/bookmarkState";
 
 export function CategoryOverview() {
   const [isModalOpen, setModalOpen] = useRecoilState(modalAtom);
-  const categories = useRecoilValue(categoryAtom)
+  const categories = useRecoilValue(categoryAtom);
   const bookmarks = useRecoilValue(bookmarkAtom);
   return (
     <div
@@ -51,17 +51,50 @@ export function CategoryOverview() {
         <div className="flex flex-col px-8 gap-4">
           <h1 className="font-semibold text-lg">Category Breakdown</h1>
           {categories.map((category) => (
-            <div key={category._id} className="dark:bg-gray-700 flex flex-col gap-4 p-4 rounded-xl">
+            <div
+              key={category._id}
+              className="dark:bg-gray-700 flex flex-col gap-4 p-4 rounded-xl"
+            >
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">{category.category}</h3>
                 <div className="text-right">
-                  <h3 className="font-medium">0 Bookmarks</h3>
-                  <h5 className="text-xs text-gray-400">0 Favorites</h5>
+                  <h3 className="font-medium">
+                    {bookmarks.filter((b) => b.category == category._id).length}{" "}
+                    Bookmarks
+                  </h3>
+                  <h5 className="text-xs text-gray-400">
+                    {
+                      bookmarks.filter(
+                        (b) => b.category == category._id && b.fav
+                      ).length
+                    }{" "}
+                    Favorites
+                  </h5>
                 </div>
               </div>
               <div>
-                <div className="bg-gray-200 dark:bg-gray-600 p-1 rounded-full mb-1"></div>
-                <div className="text-sm text-gray-400">0.0% of total</div>
+                <div className="bg-gray-200 dark:bg-gray-600 h-2 rounded-full mb-1 relative">
+                  <div
+                    className={`bg-green-600 h-full absolute top-0 z-10 rounded-full`}
+                    style={{
+                      width:
+                        (bookmarks.filter((b) => b.category == category._id)
+                          .length /
+                          bookmarks.length) *
+                          100 +
+                        "%",
+                    }}
+                  ></div>
+                </div>
+                <div className="text-sm text-gray-400">
+                  {(
+                    (bookmarks.filter((b) => b.category == category._id)
+                      .length /
+                      bookmarks.length) *
+                    100
+                  ).toFixed(2)}
+                  % of total
+                </div>
               </div>
             </div>
           ))}
