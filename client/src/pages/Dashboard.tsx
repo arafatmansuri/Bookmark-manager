@@ -129,8 +129,11 @@ function Dashboard() {
           Showing{" "}
           <span>
             {!isFave && !categoryFilter.category && bookmarks.length}
-            {isFave && bookmarkFavSelector.length}
-            {categoryFilter.category && bookmarkCatSelector.length}
+            {isFave && !categoryFilter.category && bookmarkFavSelector.length}
+            {categoryFilter.category && !isFave && bookmarkCatSelector.length}
+            {categoryFilter.category &&
+              isFave &&
+              bookmarkCatSelector.filter((b) => b.fav).length}
           </span>{" "}
           of {bookmarks.length} bookmarks
         </span>
@@ -142,6 +145,7 @@ function Dashboard() {
               !categoryFilter.category &&
               bookmarks.map((bookmark) => (
                 <BookmarkCard
+                  fav={bookmark.fav}
                   id={bookmark._id}
                   date={new Date(bookmark.createdAt)}
                   title={bookmark.title}
@@ -151,8 +155,10 @@ function Dashboard() {
                 />
               ))}
             {isFave &&
+            !categoryFilter.category &&
               bookmarkFavSelector.map((bookmark) => (
                 <BookmarkCard
+                  fav={bookmark.fav}
                   id={bookmark._id}
                   date={new Date(bookmark.createdAt)}
                   title={bookmark.title}
@@ -163,8 +169,10 @@ function Dashboard() {
               ))}
 
             {categoryFilter.category &&
+              !isFave &&
               bookmarkCatSelector.map((bookmark) => (
                 <BookmarkCard
+                  fav={bookmark.fav}
                   id={bookmark._id}
                   date={new Date(bookmark.createdAt)}
                   title={bookmark.title}
@@ -173,6 +181,21 @@ function Dashboard() {
                   category={bookmark.category}
                 />
               ))}
+            {categoryFilter.category &&
+              isFave &&
+              bookmarkCatSelector
+                .filter((b) => b.fav)
+                .map((bookmark) => (
+                  <BookmarkCard
+                    fav={bookmark.fav}
+                    id={bookmark._id}
+                    date={new Date(bookmark.createdAt)}
+                    title={bookmark.title}
+                    url={bookmark.url}
+                    key={bookmark._id}
+                    category={bookmark.category}
+                  />
+                ))}
           </div>
         )}
       </div>

@@ -10,7 +10,7 @@ import { ManageCategory } from "./ManageCategory";
 export function Main() {
   const setModalOpen = useSetRecoilState(modalAtom);
   const categories = useRecoilValue(categoryAtom);
-  const setCategoryFilter = useSetRecoilState(filterAtom);
+  const [isCategoryFilter, setCategoryFilter] = useRecoilState(filterAtom);
   const [isManageCategoryOpen, setIsManageCategoryOpen] =
     useRecoilState(manageCategoryAtom);
   const [isFav, setIsFav] = useRecoilState(favoriteAtom);
@@ -82,7 +82,7 @@ export function Main() {
             type="button"
             size="sm"
             text="All"
-            variant="secondary"
+            variant={isCategoryFilter.category !== null ? "secondary" : "filtered"}
             onClick={() => setCategoryFilter({ category: null })}
           />
           {categories.map((category) => (
@@ -92,7 +92,11 @@ export function Main() {
               size="sm"
               text={category.category}
               color="gray"
-              variant="secondary"
+              variant={
+                isCategoryFilter.category == category._id
+                  ? "filtered"
+                  : "secondary"
+              }
               onClick={() => setCategoryFilter({ category: category._id })}
             />
           ))}

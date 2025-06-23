@@ -10,6 +10,7 @@ interface BookmarkProps {
   url: string;
   date: Date;
   category?: string;
+  fav?: boolean;
 }
 const monthName = {
   "1": "Jan",
@@ -31,6 +32,7 @@ export function BookmarkCard({
   title,
   url,
   id,
+  fav = false,
 }: BookmarkProps) {
   const bookmarkMutation = useBookamrkMutation();
   const categories = useRecoilValue(categoryAtom);
@@ -38,6 +40,12 @@ export function BookmarkCard({
     bookmarkMutation.mutate({
       method: "DELETE",
       endpoint: `delete/${e.currentTarget.id}`,
+    });
+  }
+  function toggleFavorite(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
+    bookmarkMutation.mutate({
+      method: "PUT",
+      endpoint: `changefav/${e.currentTarget.id}`,
     });
   }
   useEffect(() => {
@@ -66,9 +74,23 @@ export function BookmarkCard({
       </span>
       <div className="flex justify-between items-center">
         <div className="flex gap-4 in-hover:cursor-pointer">
-          <Heart className="h-4 w-4 text-gray-500" />{" "}
-          <Copy className="h-4 w-4 text-gray-500" />{" "}
-          <ExternalLink className="h-4 w-4 text-gray-500" />
+          <Heart
+            className={`h-4 w-4 ${
+              fav ? "text-red-500" : "text-gray-500 bg-transparent"
+            }`}
+            fill={fav ? "red" : "none"}
+            id={id}
+            onClick={toggleFavorite}
+          />{" "}
+          <Copy
+            className="h-4 w-4 text-gray-500"
+            onClick={() => {
+              navigator.clipboard.writeText(url);
+            }}
+          />{" "}
+          <a target="_blank" href={url}>
+            <ExternalLink className="h-4 w-4 text-gray-500" />
+          </a>
         </div>
         <div className="flex gap-4 in-hover:cursor-pointer">
           <Pencil className="h-4 w-4 text-gray-500" />{" "}
