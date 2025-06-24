@@ -20,10 +20,17 @@ import { useCategoryQuery } from "../queries/categoryQueries";
 import {
   bookmarkAtom,
   bookmarkCategorySelector,
+  bookmarkCategoryWithFavFilterSelector,
   bookmarkFavouriteSelector,
+  bookmarkSearchAndCategorySelector,
+  bookmarkSearchSelector,
 } from "../store/bookmarkState";
 import { categoryAtom } from "../store/categoryState";
-import { favoriteAtom, filterAtom } from "../store/filterState";
+import {
+  favoriteAtom,
+  filterAtom,
+  searchFilterAtom,
+} from "../store/filterState";
 import { modalAtom } from "../store/ModalState";
 import { userAtom } from "../store/userState";
 
@@ -37,6 +44,14 @@ function Dashboard() {
   const [categories, setCategories] = useRecoilState(categoryAtom);
   const [isFave, setIsFav] = useRecoilState(favoriteAtom);
   const categoryFilter = useRecoilValue(filterAtom);
+  const searchFilter = useRecoilValue(searchFilterAtom);
+  const searchBookmarkSelector = useRecoilValue(bookmarkSearchSelector);
+  const searchAndCategoryBookmarkSelector = useRecoilValue(
+    bookmarkSearchAndCategorySelector
+  );
+  const catWithFavFilter = useRecoilValue(
+    bookmarkCategoryWithFavFilterSelector
+  );
   const userQuery = useGetUserQuery({
     credentials: true,
     endpoint: "getuser",
@@ -141,8 +156,10 @@ function Dashboard() {
           <NoBookmarks />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* {//All Bookmarks no filters} */}
             {!isFave &&
               !categoryFilter.category &&
+              searchFilter == "" &&
               bookmarks.map((bookmark) => (
                 <BookmarkCard
                   fav={bookmark.fav}
@@ -154,8 +171,10 @@ function Dashboard() {
                   category={bookmark.category}
                 />
               ))}
+            {/* {//Only Favourites with all Categories and no search} */}
             {isFave &&
-            !categoryFilter.category &&
+              !categoryFilter.category &&
+              searchFilter == "" &&
               bookmarkFavSelector.map((bookmark) => (
                 <BookmarkCard
                   fav={bookmark.fav}
@@ -167,9 +186,10 @@ function Dashboard() {
                   category={bookmark.category}
                 />
               ))}
-
+            {/* {//Only Specific Category wihout Favourites and no search} */}
             {categoryFilter.category &&
               !isFave &&
+              searchFilter == "" &&
               bookmarkCatSelector.map((bookmark) => (
                 <BookmarkCard
                   fav={bookmark.fav}
@@ -181,9 +201,38 @@ function Dashboard() {
                   category={bookmark.category}
                 />
               ))}
-            {categoryFilter.category &&
+            {/* {// Specific Category with Favourites, no Search} */}
+            {catWithFavFilter.length > 0 &&
+              catWithFavFilter.map((bookmark) => (
+                <BookmarkCard
+                  fav={bookmark.fav}
+                  id={bookmark._id}
+                  date={new Date(bookmark.createdAt)}
+                  title={bookmark.title}
+                  url={bookmark.url}
+                  key={bookmark._id}
+                  category={bookmark.category}
+                />
+              ))}
+            {/* {// Only search with All Bookmarks, no filter} */}
+            {searchFilter &&
+              !isFave &&
+              !categoryFilter.category &&
+              searchBookmarkSelector.map((bookmark) => (
+                <BookmarkCard
+                  fav={bookmark.fav}
+                  id={bookmark._id}
+                  date={new Date(bookmark.createdAt)}
+                  title={bookmark.title}
+                  url={bookmark.url}
+                  key={bookmark._id}
+                  category={bookmark.category}
+                />
+              ))}
+            {/* {// Search with Favourites} */}
+            {searchFilter &&
               isFave &&
-              bookmarkCatSelector
+              searchBookmarkSelector
                 .filter((b) => b.fav)
                 .map((bookmark) => (
                   <BookmarkCard
@@ -196,6 +245,20 @@ function Dashboard() {
                     category={bookmark.category}
                   />
                 ))}
+            {/* {//Search with Specific Category} */}
+            {searchFilter &&
+              categoryFilter.category &&
+              searchAndCategoryBookmarkSelector.map((bookmark) => (
+                <BookmarkCard
+                  fav={bookmark.fav}
+                  id={bookmark._id}
+                  date={new Date(bookmark.createdAt)}
+                  title={bookmark.title}
+                  url={bookmark.url}
+                  key={bookmark._id}
+                  category={bookmark.category}
+                />
+              ))}
           </div>
         )}
       </div>

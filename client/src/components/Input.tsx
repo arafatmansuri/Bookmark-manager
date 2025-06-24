@@ -10,7 +10,9 @@ interface InputPorps {
   width?: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   register?: any;
-  isFocus?:boolean
+  isFocus?: boolean;
+  onChange?: (e: React.InputEvent<HTMLInputElement>) => void;
+  value?: string;
 }
 export function Input({
   isLabel,
@@ -22,7 +24,9 @@ export function Input({
   isFull = true,
   width,
   register,
-  isFocus=false
+  isFocus = false,
+  onChange,
+  value,
 }: InputPorps) {
   return (
     <div className={`${isFull ? "w-full" : width}`}>
@@ -37,7 +41,9 @@ export function Input({
       <div className="relative">
         {startIcon}
         <input
-        autoFocus={isFocus}
+          autoFocus={isFocus}
+          onChange={onChange}
+          value={value}
           type={type}
           placeholder={placeholder}
           className={`w-full border border-gray-300 dark:border-gray-600 rounded-xl bg-white text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${

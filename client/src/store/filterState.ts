@@ -5,7 +5,12 @@ export const favoriteAtom = atom({
   default: false,
 });
 
-export const filterAtom = atom<{category: string | null}>({
-    key:"filterAtom",
-    default:{category:null}
-})
+export const filterAtom = atom<{ category: string | null }>({
+  key: "filterAtom",
+  default: { category: null },
+});
+
+export const searchFilterAtom = atom({
+  key: "searchFilterAtom",
+  default: "",
+});

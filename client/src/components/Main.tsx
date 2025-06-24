@@ -1,7 +1,11 @@
 import { BarChart3, Filter, Heart, Pen, Plus, Search } from "lucide-react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { categoryAtom } from "../store/categoryState";
-import { favoriteAtom, filterAtom } from "../store/filterState";
+import {
+  favoriteAtom,
+  filterAtom,
+  searchFilterAtom,
+} from "../store/filterState";
 import { manageCategoryAtom, modalAtom } from "../store/ModalState";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -14,11 +18,16 @@ export function Main() {
   const [isManageCategoryOpen, setIsManageCategoryOpen] =
     useRecoilState(manageCategoryAtom);
   const [isFav, setIsFav] = useRecoilState(favoriteAtom);
+  const [searchValue, setSearch] = useRecoilState(searchFilterAtom);
   return (
     <div className="flex flex-col dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 gap-6 justify-center">
       <div className="flex flex-wrap lg:flex-row gap-4">
         <div className="h-10 w-full lg:flex-1">
           <Input
+            onChange={(e) => {
+              setSearch(e.currentTarget.value);
+            }}
+            value={searchValue}
             startIcon={
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             }
@@ -82,7 +91,9 @@ export function Main() {
             type="button"
             size="sm"
             text="All"
-            variant={isCategoryFilter.category !== null ? "secondary" : "filtered"}
+            variant={
+              isCategoryFilter.category !== null ? "secondary" : "filtered"
+            }
             onClick={() => setCategoryFilter({ category: null })}
           />
           {categories.map((category) => (
