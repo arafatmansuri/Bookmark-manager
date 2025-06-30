@@ -8,3 +8,4 @@ export { Main } from "./Main";
 export { CategoryOverview } from "./CategoryOverview";
 export { NoBookmarks } from "./NoBookmarks";
 export { Header } from "./Header";
+export { UpdateBookmark } from "./UpdateBookmark";

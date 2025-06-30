@@ -1,7 +1,7 @@
 import { atom } from "recoil";
 
 export const modalAtom = atom<{
-  modal: "bookmark" | "category" | null;
+  modal: "bookmark" | "category" | "updateBookmark" | null;
   open: boolean;
 }>({
   key: "modalAtom",

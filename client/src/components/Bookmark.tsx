@@ -1,8 +1,10 @@
 import { Clock, Copy, ExternalLink, Heart, Pencil, Trash2 } from "lucide-react";
 import { useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useSearchParams } from "react-router-dom";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useBookamrkMutation } from "../queries/bookmarkQueries";
 import { categoryAtom } from "../store/categoryState";
+import { modalAtom } from "../store/ModalState";
 
 interface BookmarkProps {
   id: string;
@@ -36,6 +38,8 @@ export function BookmarkCard({
 }: BookmarkProps) {
   const bookmarkMutation = useBookamrkMutation();
   const categories = useRecoilValue(categoryAtom);
+  const setUpdateBookmark = useSetRecoilState(modalAtom);
+  const [bookmarkParams, setBookmarkParams] = useSearchParams();
   function deleteBookmark(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
     bookmarkMutation.mutate({
       method: "DELETE",
@@ -93,7 +97,14 @@ export function BookmarkCard({
           </a>
         </div>
         <div className="flex gap-4 in-hover:cursor-pointer">
-          <Pencil className="h-4 w-4 text-gray-500" />{" "}
+          <Pencil
+            className="h-4 w-4 text-gray-500"
+            onClick={() => {
+              bookmarkParams.set("id", id);
+              setBookmarkParams(bookmarkParams);
+              setUpdateBookmark({ modal: "updateBookmark", open: true });
+            }}
+          />{" "}
           <Trash2
             className="h-4 w-4 text-gray-500"
             id={id}

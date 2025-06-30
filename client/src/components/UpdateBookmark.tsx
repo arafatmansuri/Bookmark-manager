@@ -1,8 +1,10 @@
-import { Plus, X } from "lucide-react";
+import { Save, X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useBookamrkMutation } from "../queries/bookmarkQueries";
+import { bookmarkAtom } from "../store/bookmarkState";
 import { categoryAtom } from "../store/categoryState";
 import { modalAtom } from "../store/ModalState";
 import { Button } from "./Button";
@@ -12,7 +14,7 @@ interface BookmarkFormInput {
   bookmarkUrl: string;
   category: string;
 }
-export function AddBookmark() {
+export function UpdateBookmark() {
   const {
     register,
     formState: { errors },
@@ -21,59 +23,72 @@ export function AddBookmark() {
     setFocus,
   } = useForm<BookmarkFormInput>();
   const categories = useRecoilValue(categoryAtom);
-  const addBookmarkMutation = useBookamrkMutation();
+  const updateBookmarkMutation = useBookamrkMutation();
   const [isModalOpen, setModalOpen] = useRecoilState(modalAtom);
+  const [bookmarkParams, setBookmarkParams] = useSearchParams();
+  const bookmarks = useRecoilValue(bookmarkAtom);
+  const bookmark = bookmarks.filter(
+    (bm) => bm._id == bookmarkParams.get("id")
+  )[0];
   const addBookmark: SubmitHandler<BookmarkFormInput> = (data) => {
     if (!errors.bookmarkTitle && !errors.bookmarkUrl) {
-      addBookmarkMutation.mutate({
-        endpoint: "add",
-        method: "POST",
+      updateBookmarkMutation.mutate({
+        endpoint: `update/${bookmarkParams.get("id")}`,
+        method: "PUT",
         data: data,
       });
     }
   };
   useEffect(() => {
-    if (addBookmarkMutation.status == "success") {
-      setModalOpen({ modal: "bookmark", open: false });
-      setValue("bookmarkTitle", "");
-      setValue("bookmarkUrl", "https://");
-      setValue(
-        "category",
-        categories.filter((c) => c.category == "General")[0]?._id
-      );
+    if (updateBookmarkMutation.status == "success") {
+      setModalOpen({ modal: "updateBookmark", open: false });
+      //   setValue("bookmarkTitle", "");
+      //   setValue("bookmarkUrl", "https://");
+      //   setValue(
+      //     "category",
+      //     categories.filter((c) => c.category == "General")[0]?._id
+      //   );
+      bookmarkParams.delete("id");
+      setBookmarkParams(bookmarkParams);
     }
-    if (addBookmarkMutation.status == "error") {
-      console.log(addBookmarkMutation.error);
+    if (updateBookmarkMutation.status == "error") {
+      console.log(updateBookmarkMutation.error);
     }
-  }, [addBookmarkMutation.status]);
+  }, [updateBookmarkMutation.status]);
   useEffect(() => {
     setValue(
       "category",
-      categories.filter((c) => c.category == "General")[0]?._id
+      categories.filter((c) => c._id == bookmark?.category)[0]?._id ||
+        categories.filter((c) => c.category == "General")[0]?._id
     );
-    setValue("bookmarkUrl", "https://");
-  }, [categories]);
+    setValue("bookmarkUrl", bookmark?.url || "");
+    setValue("bookmarkTitle", bookmark?.title || "");
+  }, [categories, bookmark]);
   useEffect(() => {
     setFocus("bookmarkTitle");
   }, [isModalOpen]);
   return (
     <div
       className={`${
-        isModalOpen.open && isModalOpen.modal == "bookmark" ? "flex" : "hidden"
+        isModalOpen.open && isModalOpen.modal == "updateBookmark"
+          ? "flex"
+          : "hidden"
       } flex-col gap-2 dark:bg-gray-800 bg-white rounded-2xl shadow-2xl max-w-md min-w-[80%] md:min-w-[55%] lg:min-w-[37%] bg-opacity-50 absolute md:top-10`}
     >
       <div className="flex justify-between items-center p-6 border-b border-gray-700">
-        <h1 className="font-semibold text-xl">Add New Bookmark</h1>
+        <h1 className="font-semibold text-xl">Update Bookmark</h1>
         <button
           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer"
           onClick={() => {
-            setModalOpen({ modal: "bookmark", open: false });
+            setModalOpen({ modal: "updateBookmark", open: false });
             setValue("bookmarkTitle", "");
             setValue("bookmarkUrl", "https://");
             setValue(
               "category",
               categories.filter((c) => c.category == "General")[0]?._id
             );
+            bookmarkParams.delete("id");
+            setBookmarkParams(bookmarkParams);
           }}
         >
           <X className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -125,9 +140,9 @@ export function AddBookmark() {
             ))}
           </select>
         </div>
-        {addBookmarkMutation.isError && (
+        {updateBookmarkMutation.isError && (
           <span className="text-red-500">
-            {addBookmarkMutation?.error?.response.data.message}
+            {updateBookmarkMutation?.error?.response.data.message}
           </span>
         )}
         <div className="flex gap-2 justify-center items-center">
@@ -137,15 +152,19 @@ export function AddBookmark() {
             size="md"
             variant="secondary"
             text="Cancel"
-            onClick={() => setModalOpen({ modal: "bookmark", open: false })}
+            onClick={() => {
+              setModalOpen({ modal: "updateBookmark", open: false });
+              bookmarkParams.delete("id");
+              setBookmarkParams(bookmarkParams);
+            }}
           />
           <Button
             type="submit"
             classes="w-[50%]"
             size="md"
             variant="primary"
-            text="Add"
-            startIcon={<Plus className="h-4 w-4" />}
+            text="Update"
+            startIcon={<Save className="h-4 w-4" />}
           />
         </div>
       </form>

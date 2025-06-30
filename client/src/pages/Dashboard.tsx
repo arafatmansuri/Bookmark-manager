@@ -8,6 +8,7 @@ import {
   Header,
   Main,
   TotalCard,
+  UpdateBookmark,
 } from "../components";
 import BookmarksContainer from "../components/BookmarksContainer";
 import { useAuthMutation, useGetUserQuery } from "../queries/authQueires";
@@ -118,6 +119,7 @@ function Dashboard() {
         <BookmarksContainer />
       </div>
       <AddBookmark />
+      <UpdateBookmark />
       <CategoryOverview />
     </div>
   );

@@ -33,9 +33,10 @@ const addBookmark: Handler = async (req, res): Promise<void> => {
       category: category._id,
       createdBy: user?._id,
     });
-    res
-      .status(200)
-      .json({ message: "Bookmark created successfully", bookmark:newBookmark });
+    res.status(200).json({
+      message: "Bookmark created successfully",
+      bookmark: newBookmark,
+    });
     return;
   } catch (err: any) {
     res.status(500).json({
@@ -99,9 +100,9 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const category: ICategory | null = await CategoryModel.findOne<ICategory>({
-      $and: [{ category: bookmarkInput.data.category, createdBy: user?._id }],
-    });
+    const category: ICategory | null = await CategoryModel.findById<ICategory>(
+      bookmarkInput.data.category
+    );
     if (!category) {
       res.status(500).json({ message: "Category not found" });
       return;
@@ -123,7 +124,7 @@ const updateBookmark: Handler = async (req, res): Promise<void> => {
     }
     res.status(200).json({
       message: "Bookmark updated successfully",
-      bookmark:updatedBookmark,
+      bookmark: updatedBookmark,
     });
     return;
   } catch (err: any) {

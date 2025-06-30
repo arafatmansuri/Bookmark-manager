@@ -1,5 +1,5 @@
 import { RequestHandler as Middleware, Request, Response } from "express";
-import { Schema,Document } from "mongoose";
+import { Document, Schema } from "mongoose";
 /*
 Old Schema as per fs database
 export interface Schema {
@@ -50,7 +50,7 @@ export interface IUser {
   email: string;
   refreshToken?: string;
 }
-export interface IUserDocument extends IUser,Document {
+export interface IUserDocument extends IUser, Document {
   comparePassword: (inputPassword: string) => boolean;
   generateAccessAndRereshToken: () => {
     accessToken: string;
@@ -59,7 +59,7 @@ export interface IUserDocument extends IUser,Document {
 }
 
 export interface IBookmark extends Document {
-  title:string;
+  title: string;
   url: string;
   category: Schema.Types.ObjectId;
   fav?: boolean;
@@ -68,7 +68,7 @@ export interface IBookmark extends Document {
 
 export interface ICategory extends Document {
   category: string;
-  createdBy: Schema.Types.ObjectId;
+  createdBy: string;
 }
 // export type Middleware = (
 //   req: Request,
