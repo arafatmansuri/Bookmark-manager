@@ -43,6 +43,7 @@ function BookmarksContainer() {
           {!isFave &&
             !categoryFilter.category &&
             searchFilter == "" &&
+            bookmarks.length > 0 &&
             bookmarks.length}
           {bookmarkFavSelector.length > 0 && bookmarkFavSelector.length}
           {bookmarkCatSelector.length > 0 && bookmarkCatSelector.length}
@@ -52,14 +53,16 @@ function BookmarksContainer() {
           {searchFavCatSelector.length > 0 && searchFavCatSelector.length}
           {searchAndCategoryBookmarkSelector.length > 0 &&
             searchAndCategoryBookmarkSelector.length}
+
           {bookmarkFavSelector.length <= 0 &&
-            bookmarkCatSelector.length <= 0 &&
-            catWithFavFilter.length <= 0 &&
-            searchBookmarkSelector.length <= 0 &&
-            searchFavSelector.length <= 0 &&
-            searchFavCatSelector.length <= 0 &&
-            searchAndCategoryBookmarkSelector.length <= 0 &&
-            0}
+          bookmarkCatSelector.length <= 0 &&
+          catWithFavFilter.length <= 0 &&
+          searchBookmarkSelector.length <= 0 &&
+          searchFavSelector.length <= 0 &&
+          searchFavCatSelector.length <= 0 &&
+          searchAndCategoryBookmarkSelector.length <= 0
+            ? 0
+            : ""}
         </span>{" "}
         of {bookmarks.length} bookmarks
       </span>

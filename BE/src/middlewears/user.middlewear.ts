@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import UserModel from "../models/user.model";
-import { IUserDocument } from "../types";
+import { PrismaClient } from "../../generated/prisma";
+const prisma = new PrismaClient();
 async function verifyJWT(
   req: Request,
   res: Response,
@@ -14,14 +14,17 @@ async function verifyJWT(
       return;
     }
     const decodedToken = jwt.verify(token, <string>process.env.JWT_SECRET);
-    const user: IUserDocument | null = await UserModel.findById<IUserDocument>(
-      decodedToken._id
-    );
+    // const user: IUserDocument | null = await UserModel.findById<IUserDocument>(
+    //   decodedToken._id
+    // );
+    const user = await prisma.user.findFirst({
+      where: { id: decodedToken._id },
+    });
     if (!user) {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-    req.user = user;
+    req.user = { id: user.id };
     next();
     return;
   } catch (err: any) {

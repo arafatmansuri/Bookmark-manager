@@ -1,6 +1,7 @@
 import { z } from "zod";
-import CategoryModel from "../models/category.model";
-import { Handler, ICategory, IUserDocument } from "../types";
+import { PrismaClient } from "../../generated/prisma";
+import { Handler } from "../types";
+const prisma = new PrismaClient();
 const str = z
   .string()
   .min(3, { message: "Cateory name must contain atleast 3 char" });
@@ -15,18 +16,21 @@ const addCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const user: IUserDocument = req.user;
-    const category: ICategory | null =
-      await CategoryModel.findOne<ICategory>({
-        $and: [{ category: parsedData.data, createdBy: user?._id }],
-      });
+    const user = req.user;
+    const category = await prisma.category.findFirst({
+      where: { AND: [{ category: parsedData.data }, { authorId: user?.id }] },
+    });
     if (category) {
       res.status(302).json({ message: "Category already exists" });
       return;
     }
-    const newCategory: ICategory = await CategoryModel.create({
-      category: parsedData.data,
-      createdBy: user?._id,
+    const newCategory = await prisma.category.create({
+      data: {
+        category: parsedData.data,
+        createdBy: {
+          connect: { id: user?.id },
+        },
+      },
     });
     res.status(200).json({
       message: "New category added sucessfully",
@@ -42,11 +46,12 @@ const addCategory: Handler = async (req, res): Promise<void> => {
 
 const getAllCategories: Handler = async (req, res): Promise<void> => {
   try {
-    const user:IUserDocument = req.user;
-    const categories: ICategory[] = await CategoryModel.find<ICategory>({ createdBy: user?._id });
+    const user = req.user;
+    const categories = await prisma.category.findMany({
+      where: { authorId: user?.id },
+    });
     res.status(200).json({
       message: "Categories fetched successfully",
-      username: user?.username,
       categories,
     });
   } catch (err: any) {
@@ -60,9 +65,9 @@ const getAllCategories: Handler = async (req, res): Promise<void> => {
 const deleteCategory: Handler = async (req, res): Promise<void> => {
   try {
     const categoryId = req.params.id;
-    const category: ICategory | null = await CategoryModel.findByIdAndDelete<ICategory>(
-      categoryId
-    );
+    const category = await prisma.category.delete({
+      where: { id: categoryId },
+    });
     if (!category) {
       res.status(500).json({
         message:
@@ -85,7 +90,7 @@ const deleteCategory: Handler = async (req, res): Promise<void> => {
 const updateCategory: Handler = async (req, res): Promise<void> => {
   try {
     const categoryId = req.params.id;
-    const user:IUserDocument = req.user;
+    const user = req.user;
     const parsedData = str.safeParse(req.body.newCategoryName);
     if (!parsedData.success) {
       res.status(303).json({
@@ -95,8 +100,8 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const category: ICategory | null = await CategoryModel.findOne<ICategory>({
-      $and: [{ category: parsedData.data, createdBy: user?._id }],
+    const category = await prisma.category.findFirst({
+      where: { AND: [{ category: parsedData.data }, { authorId: user?.id }] },
     });
     if (category) {
       res.status(404).json({
@@ -104,16 +109,10 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const updatedCategory: ICategory | null =
-      await CategoryModel.findByIdAndUpdate<ICategory>(
-        categoryId,
-        {
-          $set: {
-            category: parsedData.data,
-          },
-        },
-        { new: true }
-      );
+    const updatedCategory = await prisma.category.update({
+      where: { id: categoryId },
+      data: { category: parsedData.data },
+    });
     if (!updatedCategory) {
       res.status(500).json({
         message:
@@ -123,7 +122,7 @@ const updateCategory: Handler = async (req, res): Promise<void> => {
     }
     res.status(200).json({
       message: "Category updated successfully",
-      category:updatedCategory,
+      category: updatedCategory,
     });
     return;
   } catch (err: any) {

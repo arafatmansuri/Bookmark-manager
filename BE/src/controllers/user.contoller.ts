@@ -1,9 +1,54 @@
+import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
-import CategoryModel from "../models/category.model";
-import UserModel from "../models/user.model";
-import { Handler, IUserDocument } from "../types";
+import { PrismaClient } from "../../generated/prisma";
+import { Handler } from "../types";
+const prisma = new PrismaClient().$extends({
+  query: {
+    user: {
+      async $allOperations({ operation, args, query }) {
+        if (["create", "update"].includes(operation) && args.data?.password) {
+          args.data.password = await bcrypt.hash(args.data.password, 10);
+        }
+        return query(args);
+      },
+    },
+  },
+  result: {
+    user: {
+      generateAccessAndRereshToken: {
+        needs: { username: true, id: true },
+        compute(user) {
+          return () => {
+            const accessToken = jwt.sign(
+              { username: user.username, _id: user.id },
+              <string>process.env.JWT_SECRET,
+              {
+                expiresIn: "15m",
+              }
+            );
+            const refreshToken = jwt.sign(
+              { username: user.username, _id: user.id },
+              <string>process.env.JWT_REFSECRET,
+              {
+                expiresIn: "1d",
+              }
+            );
+            return { accessToken, refreshToken };
+          };
+        },
+      },
+      comparePassword: {
+        needs: { password: true },
+        compute(user) {
+          return async (inputPassword: string) =>
+            await bcrypt.compare(inputPassword, user.password);
+        },
+      },
+    },
+  },
+});
 
 const userInputSchema = z.object({
   username: z
@@ -25,7 +70,11 @@ const userInputSchema = z.object({
       message: "Pasword should include atlist 1 special charcter",
     })
     .min(8, { message: "Password length shouldn't be less than 8" }),
-  email: z.string().email({ message: "invalid email address" }).optional(),
+  email: z.string().email({ message: "invalid email address" }),
+});
+const loginInputSchema = userInputSchema.pick({
+  password: true,
+  username: true,
 });
 type UserInputType = z.infer<typeof userInputSchema>;
 const register: Handler = async (req, res): Promise<void> => {
@@ -38,22 +87,26 @@ const register: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
-    const user: IUserDocument | null =
-      await UserModel.findOne<IUserDocument | null>({
+    const user = await prisma.user.findFirst({
+      where: {
         username: parsedBody.data.username,
-      });
+      },
+    });
     if (user) {
       res.status(303).json({ message: "Username/email already exists" });
       return;
     }
-    const newUser: IUserDocument = await UserModel.create({
-      username: parsedBody.data.username,
-      password: parsedBody.data.password,
-      email: parsedBody.data.email,
-    });
-    await CategoryModel.create({
-      category: "General",
-      createdBy: newUser?._id,
+    const newUser = await prisma.user.create({
+      data: {
+        username: parsedBody.data.username,
+        password: parsedBody.data.password,
+        email: parsedBody.data.email,
+        Category: {
+          create: {
+            category: "General",
+          },
+        },
+      },
     });
     res
       .status(200)
@@ -68,7 +121,7 @@ const register: Handler = async (req, res): Promise<void> => {
 };
 async function login(req: Request, res: Response): Promise<void> {
   try {
-    const parsedBody = userInputSchema.safeParse(req.body);
+    const parsedBody = loginInputSchema.safeParse(req.body);
     if (!parsedBody.success) {
       res.status(301).json({
         message:
@@ -76,8 +129,10 @@ async function login(req: Request, res: Response): Promise<void> {
       });
       return;
     }
-    const user: IUserDocument | null = await UserModel.findOne<IUserDocument>({
-      $and: [{ username: parsedBody.data.username }],
+    const user = await prisma.user.findFirst({
+      where: {
+        username: parsedBody.data.username,
+      },
     });
     if (!user) {
       res
@@ -90,8 +145,10 @@ async function login(req: Request, res: Response): Promise<void> {
       return;
     }
     const { accessToken, refreshToken } = user.generateAccessAndRereshToken();
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshToken },
+    });
     const options = {
       httpOnly: true,
       secure: true,
@@ -111,8 +168,11 @@ async function login(req: Request, res: Response): Promise<void> {
   }
 }
 async function getUser(req: Request, res: Response): Promise<void> {
-  const user: IUserDocument = req.user;
-  res.status(200).json({ message: "User data fetched successfully", user });
+  const userId = req.user?.id;
+  const user = await prisma.user.findFirst({ where: { id: userId } });
+  res
+    .status(200)
+    .json({ message: "User data fetched successfully", user: user });
   return;
 }
 export type TokenType = {
@@ -133,16 +193,14 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
-    const user: IUserDocument | null = await UserModel.findById<IUserDocument>(
-      decodedToken._id
-    );
+    const user = await prisma.user.findFirst({
+      where: { id: decodedToken._id },
+    });
     if (!user) {
       res.status(401).json({ message: "Invalid refresh Token" });
       return;
     }
-    const { accessToken, refreshToken } = user.generateAccessAndRereshToken();
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+    const { accessToken } = user.generateAccessAndRereshToken();
     const options = {
       httpOnly: true,
       secure: true,
@@ -153,7 +211,6 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
     res
       .status(200)
       .cookie("accessToken", accessToken, options)
-      .cookie("refreshToken", refreshToken, options)
       .json({ message: "Token refresh success" });
     return;
   } catch (err: any) {

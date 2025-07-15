@@ -12,3 +12,8 @@ export const manageCategoryAtom = atom({
   key: "manageCategoryAtom",
   default: false,
 });
+
+export const isSaveAtom = atom({
+  key: "isSave",
+  default: { id: "", isSave: false },
+});

@@ -68,7 +68,7 @@ export interface IBookmark extends Document {
 
 export interface ICategory extends Document {
   category: string;
-  createdBy: string;
+  createdBy: any;
 }
 // export type Middleware = (
 //   req: Request,

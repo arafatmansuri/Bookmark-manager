@@ -1,5 +1,5 @@
-import { Pen, Plus, Trash2, X } from "lucide-react";
-import { useEffect } from "react";
+import { Plus, Trash2, X } from "lucide-react";
+import React, { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useCategoryMutation } from "../queries/categoryQueries";
@@ -84,9 +84,15 @@ export const ManageCategory = () => {
               {category.category}
             </span>
             <div className="flex gap-1 items-center">
-              <button className="dark:text-gray-500 text-gray-400 cursor-pointer p-1">
-                <Pen className="w-4 h-4" />
-              </button>
+              {/* <button
+                className="dark:text-gray-500 text-gray-400 cursor-pointer p-1"
+                id={category._id}
+              >
+                <Pen
+                  className="w-4 h-4"
+                  onClick={() => setIsSave({ id: category._id, isSave: true })}
+                />
+              </button> */}
               <button
                 id={category._id}
                 className="dark:text-gray-500 text-gray-400 cursor-pointer p-1"
