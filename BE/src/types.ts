@@ -1,5 +1,4 @@
 import { RequestHandler as Middleware, Request, Response } from "express";
-import { Document, Schema } from "mongoose";
 /*
 Old Schema as per fs database
 export interface Schema {
@@ -44,32 +43,6 @@ export type Route = {
   handler: Handler;
 };
 
-export interface IUser {
-  username: string;
-  password: string;
-  email: string;
-  refreshToken?: string;
-}
-export interface IUserDocument extends IUser, Document {
-  comparePassword: (inputPassword: string) => boolean;
-  generateAccessAndRereshToken: () => {
-    accessToken: string;
-    refreshToken: string;
-  };
-}
-
-export interface IBookmark extends Document {
-  title: string;
-  url: string;
-  category: Schema.Types.ObjectId;
-  fav?: boolean;
-  createdBy: Schema.Types.ObjectId;
-}
-
-export interface ICategory extends Document {
-  category: string;
-  createdBy: any;
-}
 // export type Middleware = (
 //   req: Request,
 //   res: Response,

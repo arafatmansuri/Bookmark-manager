@@ -14,13 +14,12 @@ export interface BookmarkInput {
 }
 
 export interface BookmarkData {
-  _id: string;
+  id: string;
   title: string;
   url: string;
   category: string;
   fav?: boolean;
   createdBy: string;
-  _v: number;
   createdAt: string;
   updatedAt: string;
 }

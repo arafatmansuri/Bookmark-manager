@@ -14,9 +14,6 @@ async function verifyJWT(
       return;
     }
     const decodedToken = jwt.verify(token, <string>process.env.JWT_SECRET);
-    // const user: IUserDocument | null = await UserModel.findById<IUserDocument>(
-    //   decodedToken._id
-    // );
     const user = await prisma.user.findFirst({
       where: { id: decodedToken._id },
     });

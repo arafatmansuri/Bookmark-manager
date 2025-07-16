@@ -77,11 +77,11 @@ function BookmarksContainer() {
             bookmarks.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -90,11 +90,11 @@ function BookmarksContainer() {
             bookmarkFavSelector.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -103,11 +103,11 @@ function BookmarksContainer() {
             bookmarkCatSelector.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -116,11 +116,11 @@ function BookmarksContainer() {
             catWithFavFilter.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -129,11 +129,11 @@ function BookmarksContainer() {
             searchBookmarkSelector.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -142,11 +142,11 @@ function BookmarksContainer() {
             searchFavSelector.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -155,11 +155,11 @@ function BookmarksContainer() {
             searchAndCategoryBookmarkSelector.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}
@@ -168,11 +168,11 @@ function BookmarksContainer() {
             searchFavCatSelector.map((bookmark) => (
               <BookmarkCard
                 fav={bookmark.fav}
-                id={bookmark._id}
+                id={bookmark.id}
                 date={new Date(bookmark.createdAt)}
                 title={bookmark.title}
                 url={bookmark.url}
-                key={bookmark._id}
+                key={bookmark.id}
                 category={bookmark.category}
               />
             ))}

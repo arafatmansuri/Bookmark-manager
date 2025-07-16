@@ -9,9 +9,9 @@ const addCategory: Handler = async (req, res): Promise<void> => {
   try {
     const parsedData = str.safeParse(req.body.categoryName);
     if (!parsedData.success) {
-      res.status(303).json({
+      res.status(403).json({
         message:
-          parsedData.error.errors[0].message ||
+          parsedData.error.issues[0].message ||
           "Category name must not be empty",
       });
       return;
@@ -21,7 +21,7 @@ const addCategory: Handler = async (req, res): Promise<void> => {
       where: { AND: [{ category: parsedData.data }, { authorId: user?.id }] },
     });
     if (category) {
-      res.status(302).json({ message: "Category already exists" });
+      res.status(402).json({ message: "Category already exists" });
       return;
     }
     const newCategory = await prisma.category.create({

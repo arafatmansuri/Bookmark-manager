@@ -79,22 +79,22 @@ export const ManageCategory = () => {
       </form>
       <div className="flex flex-col gap-2 max-h-52 space-y-2 overflow-y-auto p-2">
         {categories.map((category) => (
-          <div key={category._id} className="flex justify-between items-center">
+          <div key={category.id} className="flex justify-between items-center">
             <span className="text-sm dark:text-gray-300 text-gray-700">
               {category.category}
             </span>
             <div className="flex gap-1 items-center">
               {/* <button
                 className="dark:text-gray-500 text-gray-400 cursor-pointer p-1"
-                id={category._id}
+                id={category.id}
               >
                 <Pen
                   className="w-4 h-4"
-                  onClick={() => setIsSave({ id: category._id, isSave: true })}
+                  onClick={() => setIsSave({ id: category.id, isSave: true })}
                 />
               </button> */}
               <button
-                id={category._id}
+                id={category.id}
                 className="dark:text-gray-500 text-gray-400 cursor-pointer p-1"
                 onClick={deleteCategory}
               >

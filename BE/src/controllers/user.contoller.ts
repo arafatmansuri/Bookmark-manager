@@ -81,9 +81,10 @@ const register: Handler = async (req, res): Promise<void> => {
   try {
     const parsedBody = userInputSchema.safeParse(req.body);
     if (!parsedBody.success) {
-      res.status(301).json({
+      res.status(403).json({
         message:
-          parsedBody.error.errors[0].message || "Username/password compulsory",
+          parsedBody.error.issues[0].message ||
+          "Username/password compulsory",
       });
       return;
     }
@@ -93,7 +94,7 @@ const register: Handler = async (req, res): Promise<void> => {
       },
     });
     if (user) {
-      res.status(303).json({ message: "Username/email already exists" });
+      res.status(404).json({ message: "Username/email already exists" });
       return;
     }
     const newUser = await prisma.user.create({
@@ -123,9 +124,9 @@ async function login(req: Request, res: Response): Promise<void> {
   try {
     const parsedBody = loginInputSchema.safeParse(req.body);
     if (!parsedBody.success) {
-      res.status(301).json({
+      res.status(403).json({
         message:
-          parsedBody.error.errors[0].message || "Username/password compulsory",
+          parsedBody.error.issues[0].message || "Username/password compulsory",
       });
       return;
     }

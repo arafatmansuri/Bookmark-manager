@@ -28,7 +28,7 @@ export function UpdateBookmark() {
   const [bookmarkParams, setBookmarkParams] = useSearchParams();
   const bookmarks = useRecoilValue(bookmarkAtom);
   const bookmark = bookmarks.filter(
-    (bm) => bm._id == bookmarkParams.get("id")
+    (bm) => bm.id == bookmarkParams.get("id")
   )[0];
   const addBookmark: SubmitHandler<BookmarkFormInput> = (data) => {
     if (!errors.bookmarkTitle && !errors.bookmarkUrl) {
@@ -46,7 +46,7 @@ export function UpdateBookmark() {
       //   setValue("bookmarkUrl", "https://");
       //   setValue(
       //     "category",
-      //     categories.filter((c) => c.category == "General")[0]?._id
+      //     categories.filter((c) => c.category == "General")[0]?.id
       //   );
       bookmarkParams.delete("id");
       setBookmarkParams(bookmarkParams);
@@ -58,8 +58,8 @@ export function UpdateBookmark() {
   useEffect(() => {
     setValue(
       "category",
-      categories.filter((c) => c._id == bookmark?.category)[0]?._id ||
-        categories.filter((c) => c.category == "General")[0]?._id
+      categories.filter((c) => c.id == bookmark?.category)[0]?.id ||
+        categories.filter((c) => c.category == "General")[0]?.id
     );
     setValue("bookmarkUrl", bookmark?.url || "");
     setValue("bookmarkTitle", bookmark?.title || "");
@@ -85,7 +85,7 @@ export function UpdateBookmark() {
             setValue("bookmarkUrl", "https://");
             setValue(
               "category",
-              categories.filter((c) => c.category == "General")[0]?._id
+              categories.filter((c) => c.category == "General")[0]?.id
             );
             bookmarkParams.delete("id");
             setBookmarkParams(bookmarkParams);
@@ -134,7 +134,7 @@ export function UpdateBookmark() {
             {...register("category")}
           >
             {categories.map((opt) => (
-              <option value={opt._id} key={opt._id}>
+              <option value={opt.id} key={opt.id}>
                 {opt.category}
               </option>
             ))}

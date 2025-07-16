@@ -52,20 +52,20 @@ export function CategoryOverview() {
           <h1 className="font-semibold text-lg">Category Breakdown</h1>
           {categories.map((category) => (
             <div
-              key={category._id}
+              key={category.id}
               className="dark:bg-gray-700 flex flex-col gap-4 p-4 rounded-xl"
             >
               <div className="flex justify-between items-center">
                 <h3 className="font-medium">{category.category}</h3>
                 <div className="text-right">
                   <h3 className="font-medium">
-                    {bookmarks.filter((b) => b.category == category._id).length}{" "}
+                    {bookmarks.filter((b) => b.category == category.id).length}{" "}
                     Bookmarks
                   </h3>
                   <h5 className="text-xs text-gray-400">
                     {
                       bookmarks.filter(
-                        (b) => b.category == category._id && b.fav
+                        (b) => b.category == category.id && b.fav
                       ).length
                     }{" "}
                     Favorites
@@ -78,7 +78,7 @@ export function CategoryOverview() {
                     className={`bg-green-600 h-full absolute top-0 z-10 rounded-full`}
                     style={{
                       width:
-                        (bookmarks.filter((b) => b.category == category._id)
+                        (bookmarks.filter((b) => b.category == category.id)
                           .length /
                           bookmarks.length) *
                           100 +
@@ -88,7 +88,7 @@ export function CategoryOverview() {
                 </div>
                 <div className="text-sm text-gray-400">
                   {(
-                    (bookmarks.filter((b) => b.category == category._id)
+                    (bookmarks.filter((b) => b.category == category.id)
                       .length /
                       bookmarks.length) *
                     100

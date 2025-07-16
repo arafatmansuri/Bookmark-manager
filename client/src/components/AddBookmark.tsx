@@ -39,7 +39,7 @@ export function AddBookmark() {
       setValue("bookmarkUrl", "https://");
       setValue(
         "category",
-        categories.filter((c) => c.category == "General")[0]?._id
+        categories.filter((c) => c.category == "General")[0]?.id
       );
     }
     if (addBookmarkMutation.status == "error") {
@@ -49,7 +49,7 @@ export function AddBookmark() {
   useEffect(() => {
     setValue(
       "category",
-      categories.filter((c) => c.category == "General")[0]?._id
+      categories.filter((c) => c.category == "General")[0]?.id
     );
     setValue("bookmarkUrl", "https://");
   }, [categories]);
@@ -72,7 +72,7 @@ export function AddBookmark() {
             setValue("bookmarkUrl", "https://");
             setValue(
               "category",
-              categories.filter((c) => c.category == "General")[0]?._id
+              categories.filter((c) => c.category == "General")[0]?.id
             );
           }}
         >
@@ -119,7 +119,7 @@ export function AddBookmark() {
             {...register("category")}
           >
             {categories.map((opt) => (
-              <option value={opt._id} key={opt._id}>
+              <option value={opt.id} key={opt.id}>
                 {opt.category}
               </option>
             ))}

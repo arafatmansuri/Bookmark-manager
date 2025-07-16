@@ -98,17 +98,17 @@ export function Main() {
           />
           {categories.map((category) => (
             <Button
-              key={category._id}
+              key={category.id}
               type="button"
               size="sm"
               text={category.category}
               color="gray"
               variant={
-                isCategoryFilter.category == category._id
+                isCategoryFilter.category == category.id
                   ? "filtered"
                   : "secondary"
               }
-              onClick={() => setCategoryFilter({ category: category._id })}
+              onClick={() => setCategoryFilter({ category: category.id })}
             />
           ))}
         </div>

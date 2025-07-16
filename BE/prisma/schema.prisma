@@ -22,6 +22,8 @@ model User {
   refreshToken String?
   Category Category[]
   Bookmarks Bookmarks[]
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model Category {
@@ -30,6 +32,8 @@ model Category {
   createdBy User     @relation(fields: [authorId],references: [id])
   authorId  String   @db.ObjectId
   Bookmarks Bookmarks[]
+  createdAt DateTime? @default(now()) 
+  updatedAt DateTime? @updatedAt
 }
 
 model Bookmarks {
@@ -41,4 +45,6 @@ model Bookmarks {
   fav      Boolean   @default(false)
   createdBy User     @relation(fields: [authorId],references: [id])
   authorId  String   @db.ObjectId
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
