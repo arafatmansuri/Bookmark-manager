@@ -5,13 +5,19 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useBookamrkMutation } from "../queries/bookmarkQueries";
 import { categoryAtom } from "../store/categoryState";
 import { modalAtom } from "../store/ModalState";
-
+type category = {
+  id: string;
+  category: string;
+  authorId: string;
+  createdAt: null | string;
+  updatedAt: null | string;
+};
 interface BookmarkProps {
   id: string;
   title: string;
   url: string;
   date: Date;
-  category?: string;
+  category?: category;
   fav?: boolean;
 }
 const monthName = {
@@ -36,7 +42,6 @@ export function BookmarkCard({
   id,
   fav = false,
 }: BookmarkProps) {
-  console.log(date);
   const bookmarkMutation = useBookamrkMutation();
   const categories = useRecoilValue(categoryAtom);
   const setUpdateBookmark = useSetRecoilState(modalAtom);
@@ -61,11 +66,11 @@ export function BookmarkCard({
   return (
     <div className="flex flex-col gap-7 justify-end dark:bg-gray-800 rounded-md px-6 py-6 hover:-translate-y-1 transition-transform duration-300 delay-50 dark:border-gray-700 border border-gray-300">
       <div>
-        {categories.find((c) => c.id == category)?.category && (
+        {categories.find((c) => c.id == category?.id)?.category && (
           <div
             className={`flex gap-2 mb-4 py-0.5 px-3 text-sm rounded-full w-fit bg-gray-500`}
           >
-            {categories.find((c) => c.id == category)?.category}
+            {categories.find((c) => c.id == category?.id)?.category}
           </div>
         )}
         <h1 className="text-lg font-semibold">{title}</h1>

@@ -29,7 +29,7 @@ export const bookmarkCategorySelector = selector({
         get(filterAtom).category &&
         !get(favoriteAtom) &&
         get(searchFilterAtom) == "" &&
-        b.category == get(filterAtom).category
+        b.category.id == get(filterAtom).category
     );
   },
 });
@@ -70,7 +70,7 @@ export const bookmarkSearchAndCategorySelector = selector({
         get(filterAtom).category &&
         !get(favoriteAtom) &&
         b.title.startsWith(get(searchFilterAtom)) &&
-        b.category == get(filterAtom).category
+        b.category.id == get(filterAtom).category
     );
   },
 });
@@ -83,7 +83,7 @@ export const bookmarkSearchAndCategoryFavSelector = selector({
         get(filterAtom).category &&
         get(favoriteAtom) &&
         b.title.startsWith(get(searchFilterAtom)) &&
-        b.category == get(filterAtom).category &&
+        b.category.id == get(filterAtom).category &&
         b.fav
     );
   },
@@ -98,7 +98,7 @@ export const bookmarkCategoryWithFavFilterSelector = selector({
         get(filterAtom).category &&
         get(searchFilterAtom) == "" &&
         b.fav &&
-        b.category == get(filterAtom).category
+        b.category.id == get(filterAtom).category
     );
   },
 });

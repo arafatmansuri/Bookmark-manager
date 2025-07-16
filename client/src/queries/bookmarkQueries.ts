@@ -12,12 +12,18 @@ export interface BookmarkInput {
   method: "GET" | "POST" | "PUT" | "DELETE";
   data?: { bookmarkTitle: string; bookmarkUrl: string; category: string };
 }
-
+type category = {
+  id: string;
+  category: string;
+  authorId: string;
+  createdAt: null | string;
+  updatedAt: null | string;
+};
 export interface BookmarkData {
   id: string;
   title: string;
   url: string;
-  category: string;
+  category: category;
   fav?: boolean;
   createdBy: string;
   createdAt: string;

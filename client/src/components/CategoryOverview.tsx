@@ -59,13 +59,13 @@ export function CategoryOverview() {
                 <h3 className="font-medium">{category.category}</h3>
                 <div className="text-right">
                   <h3 className="font-medium">
-                    {bookmarks.filter((b) => b.category == category.id).length}{" "}
+                    {bookmarks.filter((b) => b.category.id == category.id).length}{" "}
                     Bookmarks
                   </h3>
                   <h5 className="text-xs text-gray-400">
                     {
                       bookmarks.filter(
-                        (b) => b.category == category.id && b.fav
+                        (b) => b.category.id == category.id && b.fav
                       ).length
                     }{" "}
                     Favorites
@@ -78,7 +78,7 @@ export function CategoryOverview() {
                     className={`bg-green-600 h-full absolute top-0 z-10 rounded-full`}
                     style={{
                       width:
-                        (bookmarks.filter((b) => b.category == category.id)
+                        (bookmarks.filter((b) => b.category.id == category.id)
                           .length /
                           bookmarks.length) *
                           100 +
@@ -88,7 +88,7 @@ export function CategoryOverview() {
                 </div>
                 <div className="text-sm text-gray-400">
                   {(
-                    (bookmarks.filter((b) => b.category == category.id)
+                    (bookmarks.filter((b) => b.category.id == category.id)
                       .length /
                       bookmarks.length) *
                     100
