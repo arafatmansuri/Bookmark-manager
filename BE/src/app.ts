@@ -24,10 +24,10 @@ app.use(
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/category", verifyJWT, categoryRouter);
-app.use("/api/v1/bookmark",verifyJWT, bookmarkRouter);
-app.get("/", (req, res): void => {
+app.use("/api/v1/bookmark", verifyJWT, bookmarkRouter);
+app.get("/ping", (req, res): void => {
   //   res.clearCookie();
-  res.send("Server running fine");
+  res.status(200).json({ message: "Server running fine" });
   return;
 });
 

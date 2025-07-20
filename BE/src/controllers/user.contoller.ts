@@ -8,7 +8,9 @@ const prisma = new PrismaClient().$extends({
   query: {
     user: {
       async $allOperations({ operation, args, query }) {
+        //@ts-ignore
         if (["create", "update"].includes(operation) && args.data?.password) {
+          //@ts-ignore
           args.data.password = await bcrypt.hash(args.data.password, 10);
         }
         return query(args);
@@ -111,7 +113,7 @@ const register: Handler = async (req, res): Promise<void> => {
     });
     res
       .status(200)
-      .json({ message: "User registred successful", user: newUser });
+      .json({ message: "User registred successfully", user: newUser });
     return;
   } catch (err: any) {
     res
