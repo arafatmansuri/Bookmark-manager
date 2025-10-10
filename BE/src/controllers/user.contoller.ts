@@ -85,8 +85,7 @@ const register: Handler = async (req, res): Promise<void> => {
     if (!parsedBody.success) {
       res.status(403).json({
         message:
-          parsedBody.error.issues[0].message ||
-          "Username/password compulsory",
+          parsedBody.error.issues[0].message || "Username/password compulsory",
       });
       return;
     }
@@ -188,7 +187,7 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       res.status(401).json({ message: "Refresh token is empty" });
       return;
     }
-    const decodedToken: jwt.JwtPayload = jwt.verify(
+    const decodedToken = jwt.verify(
       IrefreshToken,
       <string>process.env.JWT_REFSECRET
     );
@@ -197,7 +196,8 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
       return;
     }
     const user = await prisma.user.findFirst({
-      where: { id: decodedToken._id },
+      //@ts-ignore
+      where: { id: decodedToken?._id },
     });
     if (!user) {
       res.status(401).json({ message: "Invalid refresh Token" });
