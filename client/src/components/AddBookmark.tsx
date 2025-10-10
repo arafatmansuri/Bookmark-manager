@@ -127,7 +127,7 @@ export function AddBookmark() {
         </div>
         {addBookmarkMutation.isError && (
           <span className="text-red-500">
-            {addBookmarkMutation?.error?.response.data.message}
+            {addBookmarkMutation?.error?.message}
           </span>
         )}
         <div className="flex gap-2 justify-center items-center">

@@ -34,23 +34,28 @@ const bookmarkRequest = async <T>({
   method,
   data,
 }: BookmarkInput): Promise<T> => {
-  const response = await axios(`${BACKEND_URL}/bookmark/${endpoint}`, {
-    method,
-    data,
-    withCredentials: true,
-    headers: {
-      "Cache-Control": "no-cache",
-      Pragma: "no-cache",
-      Expires: "0",
-    },
-  });
-  if (endpoint == "display") {
-    return response.data;
+  try {
+    const response = await axios(`${BACKEND_URL}/bookmark/${endpoint}`, {
+      method,
+      data,
+      withCredentials: true,
+      headers: {
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
+    if (endpoint == "display") {
+      return response.data;
+    }
+    if (method == "GET" && endpoint != "display") {
+      return response.data.bookmarks;
+    }
+    return response.data.bookmark;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err:any) {
+    throw { message: err.response?.data?.message || "Unknown error" };
   }
-  if (method == "GET" && endpoint != "display") {
-    return response.data.bookmarks;
-  }
-  return response.data.bookmark;
 };
 export const useBookmarkQuery = <T>({
   endpoint,
@@ -65,12 +70,27 @@ export const useBookmarkQuery = <T>({
   });
 };
 
+// export const useBookamrkMutation = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation<BookmarkData | { message: string }>(
+//     async ({ endpoint, method, data }: BookmarkInput) => {
+//       return await bookmarkRequest<BookmarkData | { message: string }>({
+//         endpoint,
+//         method,
+//         data,
+//       });
+//     })
+// };
 export const useBookamrkMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation({
+  return useMutation<BookmarkData,{ message: string },BookmarkInput>({
     mutationKey: ["bookmarkMutation"],
     mutationFn: async ({ endpoint, method, data }: BookmarkInput) => {
-      return await bookmarkRequest<BookmarkData>({ endpoint, method, data });
+      return await bookmarkRequest<BookmarkData>({
+        endpoint,
+        method,
+        data,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookmark"] });

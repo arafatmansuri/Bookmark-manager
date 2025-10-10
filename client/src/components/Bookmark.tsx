@@ -21,18 +21,18 @@ interface BookmarkProps {
   fav?: boolean;
 }
 const monthName = {
-  "1": "Jan",
-  "2": "Feb",
-  "3": "Mar",
-  "4": "Apr",
-  "5": "May",
-  "6": "Jun",
-  "7": "Jul",
-  "8": "Aug",
-  "9": "Sep",
-  "10": "Oct",
-  "11": "Nov",
-  "12": "Dec",
+  1: "Jan",
+  2: "Feb",
+  3: "Mar",
+  4: "Apr",
+  5: "May",
+  6: "Jun",
+  7: "Jul",
+  8: "Aug",
+  9: "Sep",
+  10: "Oct",
+  11: "Nov",
+  12: "Dec",
 };
 export function BookmarkCard({
   category,
@@ -77,10 +77,10 @@ export function BookmarkCard({
         <h4 className="text-sm dark:text-gray-400 text-gray-500">{url}</h4>
       </div>
       <span className="text-xs dark:text-gray-500 text-gray-400 flex items-center gap-1">
-        <Clock className="h-3 w-3" /> Created{" "}
-        {monthName[date.getMonth().toString()]} {date.getDate()},{" "}
-        {date.getFullYear()}, {date.getHours()}:{date.getMinutes()}{" "}
-        {date.getHours() > 12 ? "PM" : "AM"}
+        <Clock className="h-3 w-3" /> Created //@ts-ignore
+        {monthName[1]} {/* {monthName[date.getMonth()]}{" "} */}
+        {date.getDate()}, {date.getFullYear()}, {date.getHours()}:
+        {date.getMinutes()} {date.getHours() > 12 ? "PM" : "AM"}
       </span>
       <div className="flex justify-between items-center">
         <div className="flex gap-4 in-hover:cursor-pointer">

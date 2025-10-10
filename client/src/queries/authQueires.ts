@@ -15,12 +15,17 @@ async function authRequest({
   credentials,
   method,
 }: UserFormData): Promise<UserData> {
-  const response = await axios(`${BACKEND_URL}/user/${endpoint}`, {
-    method,
-    data,
-    withCredentials: credentials,
-  });
-  return response.data.user;
+  try {
+    const response = await axios(`${BACKEND_URL}/user/${endpoint}`, {
+      method,
+      data,
+      withCredentials: credentials,
+    });
+    return response.data.user;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    throw { message: err.response?.data?.message || "Unknown error" };
+  }
 }
 
 export const useGetUserQuery = ({
@@ -38,7 +43,7 @@ export const useGetUserQuery = ({
 };
 
 export const useAuthMutation = () => {
-  return useMutation({
+  return useMutation<UserData,{message:string},UserFormData>({
     mutationKey: ["authMutation"],
     mutationFn: async ({
       method,
@@ -49,7 +54,7 @@ export const useAuthMutation = () => {
       return await authRequest({ method, data, endpoint, credentials });
     },
       onError: (error) => {
-        if (!error?.response) {
+        if (!error.message) {
           throw new Error("Network Error");
         }
     }

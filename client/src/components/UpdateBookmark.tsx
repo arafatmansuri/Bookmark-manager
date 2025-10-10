@@ -58,7 +58,7 @@ export function UpdateBookmark() {
   useEffect(() => {
     setValue(
       "category",
-      categories.filter((c) => c.id == bookmark?.category)[0]?.id ||
+      categories.filter((c) => c.id == bookmark?.category.id)[0]?.id ||
         categories.filter((c) => c.category == "General")[0]?.id
     );
     setValue("bookmarkUrl", bookmark?.url || "");
@@ -142,7 +142,7 @@ export function UpdateBookmark() {
         </div>
         {updateBookmarkMutation.isError && (
           <span className="text-red-500">
-            {updateBookmarkMutation?.error?.response.data.message}
+            {updateBookmarkMutation?.error?.message}
           </span>
         )}
         <div className="flex gap-2 justify-center items-center">

@@ -120,7 +120,7 @@ export default function Signup() {
           </div>
           {signupMutation.isError && (
             <span className="text-red-500">
-              {signupMutation.error?.response.data.message}
+              {signupMutation.error?.message}
             </span>
           )}
           <Button
