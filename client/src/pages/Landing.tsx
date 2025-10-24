@@ -5,7 +5,6 @@ import {
   Folder,
   Heart,
   Search,
-  Shield,
   Smartphone,
   Zap,
 } from "lucide-react";
@@ -176,7 +175,7 @@ export const LandingPage = () => {
             </div>
 
             {/* Feature 6 */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
+            {/* <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
               <div className="p-3 bg-indigo-100 dark:bg-indigo-900 rounded-xl w-fit mb-4">
                 <Shield className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
               </div>
@@ -187,7 +186,7 @@ export const LandingPage = () => {
                 Your data stays private with local storage and secure
                 authentication to protect your bookmarks.
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>

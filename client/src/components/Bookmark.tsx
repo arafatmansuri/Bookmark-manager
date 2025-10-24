@@ -53,6 +53,8 @@ export function BookmarkCard({
     });
   }
   function toggleFavorite(e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
+    const fill = e.currentTarget.style.fill;
+    e.currentTarget.style.fill = fill == "red" ? "none" : "red";
     bookmarkMutation.mutate({
       method: "PUT",
       endpoint: `changefav/${e.currentTarget.id}`,
@@ -74,47 +76,63 @@ export function BookmarkCard({
           </div>
         )}
         <h1 className="text-lg font-semibold">{title}</h1>
-        <h4 className="text-sm dark:text-gray-400 text-gray-500">{url}</h4>
+        <a
+          href={url}
+          target="_blank"
+          className="text-sm dark:text-gray-400 text-gray-500 hover:text-blue-500"
+        >
+          {url}
+        </a>
       </div>
       <span className="text-xs dark:text-gray-500 text-gray-400 flex items-center gap-1">
-        <Clock className="h-3 w-3" /> Created {monthName[date.getMonth()]}{" "}
+        <Clock className="h-3.5 w-3.5" />{monthName[date.getMonth()]}{" "}
         {date.getDate()}, {date.getFullYear()}, {date.getHours()}:
         {date.getMinutes()} {date.getHours() > 12 ? "PM" : "AM"}
       </span>
       <div className="flex justify-between items-center">
         <div className="flex gap-4 in-hover:cursor-pointer">
-          <Heart
-            className={`h-4 w-4 ${
-              fav ? "text-red-500" : "text-gray-500 bg-transparent"
-            }`}
-            fill={fav ? "red" : "none"}
-            id={id}
-            onClick={toggleFavorite}
-          />{" "}
-          <Copy
-            className="h-4 w-4 text-gray-500"
-            onClick={() => {
-              navigator.clipboard.writeText(url);
-            }}
-          />{" "}
+          <abbr title="favourite">
+            <Heart
+              className={`h-4 w-4 ${
+                fav ? "text-red-500" : "text-gray-500 bg-transparent"
+              } hover:text-red-500`}
+              fill={fav ? "red" : "none"}
+              id={id}
+              onClick={toggleFavorite}
+            />
+          </abbr>{" "}
+          <abbr title="copy">
+            <Copy
+              className="h-4 w-4 text-gray-500 hover:text-green-500"
+              onClick={() => {
+                navigator.clipboard.writeText(url);
+              }}
+            />
+          </abbr>{" "}
           <a target="_blank" href={url}>
-            <ExternalLink className="h-4 w-4 text-gray-500" />
+            <abbr title="open link">
+              <ExternalLink className="h-4 w-4 text-gray-500 hover:text-blue-500" />
+            </abbr>
           </a>
         </div>
         <div className="flex gap-4 in-hover:cursor-pointer">
-          <Pencil
-            className="h-4 w-4 text-gray-500"
-            onClick={() => {
-              bookmarkParams.set("id", id);
-              setBookmarkParams(bookmarkParams);
-              setUpdateBookmark({ modal: "updateBookmark", open: true });
-            }}
-          />{" "}
-          <Trash2
-            className="h-4 w-4 text-gray-500"
-            id={id}
-            onClick={deleteBookmark}
-          />{" "}
+          <abbr title="edit">
+            <Pencil
+              className="h-4 w-4 text-gray-500 hover:text-green-500"
+              onClick={() => {
+                bookmarkParams.set("id", id);
+                setBookmarkParams(bookmarkParams);
+                setUpdateBookmark({ modal: "updateBookmark", open: true });
+              }}
+            />
+          </abbr>{" "}
+          <abbr title="delete">
+            <Trash2
+              className="h-4 w-4 text-gray-500 hover:text-red-500"
+              id={id}
+              onClick={deleteBookmark}
+            />
+          </abbr>{" "}
         </div>
       </div>
     </div>

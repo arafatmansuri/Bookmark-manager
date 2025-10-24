@@ -11,6 +11,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
   "https://bookmark-manager-6dbg0frg0-mohammed-arafats-projects-b237d054.vercel.app",
   "https://bookmark-manager-bice.vercel.app",
+  "https://bookmark-pro.vercel.app",
 ];
 app.use(express.json());
 app.use(cookieParser());
