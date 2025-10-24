@@ -1,3 +1,5 @@
+import { Loader } from "./Loader";
+
 interface ButtonProps {
   text: string;
   variant: "primary" | "secondary" | "favorite" | "filtered";
@@ -8,6 +10,7 @@ interface ButtonProps {
   color?: string;
   classes?: string;
   type: "submit" | "reset" | "button" | undefined;
+  isLoading?: boolean;
 }
 const variantClasses: {
   primary: string;
@@ -36,6 +39,7 @@ export function Button({
   endIcon,
   classes,
   type,
+  isLoading,
 }: ButtonProps) {
   return (
     <button
@@ -49,8 +53,8 @@ export function Button({
           style={{ backgroundColor: color }}
         ></div>
       )}{" "}
-      {startIcon}
-      {text}
+      {!isLoading && startIcon}
+      {isLoading ? <Loader /> : text}
       {endIcon}
     </button>
   );

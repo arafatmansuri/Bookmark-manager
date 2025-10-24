@@ -139,6 +139,7 @@ export default function Signup() {
             text="Create Account"
             variant="primary"
             classes="w-full"
+            isLoading={signupMutation.isPending}
           />
           <button
             className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors duration-200 cursor-pointer"

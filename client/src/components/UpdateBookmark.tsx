@@ -159,6 +159,7 @@ export function UpdateBookmark() {
             }}
           />
           <Button
+            isLoading={updateBookmarkMutation.isPending}
             type="submit"
             classes="w-[50%]"
             size="md"

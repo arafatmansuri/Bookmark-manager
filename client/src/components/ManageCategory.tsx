@@ -69,6 +69,7 @@ export const ManageCategory = () => {
           width="w-[85%]"
         />
         <Button
+          isLoading={categoryMutation.isPending}
           type="submit"
           size="sm"
           text=""

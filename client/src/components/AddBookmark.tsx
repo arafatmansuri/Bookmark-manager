@@ -140,6 +140,7 @@ export function AddBookmark() {
             onClick={() => setModalOpen({ modal: "bookmark", open: false })}
           />
           <Button
+            isLoading={addBookmarkMutation.isPending}
             type="submit"
             classes="w-[50%]"
             size="md"

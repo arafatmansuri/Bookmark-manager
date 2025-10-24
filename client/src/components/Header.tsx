@@ -26,7 +26,7 @@ export function Header() {
         </div>
         <div className="">
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
-            Bookmark Manager
+            Bookmark Pro
           </h1>
           <h4 className="text-gray-600 text-xs md:text-sm dark:text-gray-400">
             Organize and manage your bookmarks

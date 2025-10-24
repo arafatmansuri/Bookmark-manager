@@ -96,6 +96,7 @@ export default function Signin() {
             </span>
           )}
           <Button
+          isLoading={signinMutation.isPending}
             type="submit"
             size="lg"
             text="Sign In"
