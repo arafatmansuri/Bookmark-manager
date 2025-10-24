@@ -224,9 +224,16 @@ async function refreshAccessToken(req: Request, res: Response): Promise<void> {
   }
 }
 function logout(req: Request, res: Response): void {
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: <"none">"none",
+    path: "/",
+    maxAge: 0, // 1 day
+  };
   res
-    .clearCookie("accessToken", { path: "/" })
-    .clearCookie("refreshToken", { path: "/" })
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
     .end();
   return;
 }

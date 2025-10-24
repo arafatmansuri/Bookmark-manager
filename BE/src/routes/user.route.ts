@@ -13,6 +13,6 @@ userRouter.route("/register").post(register);
 userRouter.route("/login").post(login);
 userRouter.route("/getuser").get(verifyJWT, getUser);
 userRouter.route("/refreshtoken").post(refreshAccessToken);
-userRouter.route("/logout").get(verifyJWT, logout);
+userRouter.route("/logout").post(verifyJWT, logout);
 
 export default userRouter;
